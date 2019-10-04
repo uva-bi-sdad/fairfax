@@ -72,5 +72,3 @@ ggplot() +
   labs(title = "Fairfax County Opportunity Zones and Neighboring Tracts") +
   theme_map() +
   theme(plot.title = element_text(size = 16, face = "bold"))
-
-
