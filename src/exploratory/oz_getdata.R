@@ -25,7 +25,7 @@ census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
 
 #
-# Get variable data for geography & transform -------------------------------------------------------------------------------------------------------------
+# Select variables -------------------------------------------------------------------------------------------------------------
 #
 
 # ACS variables  
@@ -46,16 +46,20 @@ acsvars <- c("B00001_001",                                                      
              "B25002_001","B25002_003",                                                                                            # proportion vacant housing units, vacant / total -- 003 / 001
              "B25003_001","B25003_003",                                                                                            # proportion renters, renters  /total -- 003 / 001
              "B25035_001",                                                                                                         # median year structure built
-             "B25071_001",                                                                                                         # median gross rent as percentage of HH income
-             "B28011_001", "B28011_008")                                                                                           # no internet access, no access / total (008 / 001)
+             "B25071_001")                                                                                                         # median gross rent as percentage of HH income
 
+
+
+#
+# Get variable data for geography & transform: 2013-17 -------------------------------------------------------------------------------------------------------------
+#
 
 # Get county-level variables from ACS 2013-2017 (5-year)
-acs_est <- get_acs(geography = "tract", state = 51, county = 059, variables = acsvars, year = 2017, survey = "acs5", cache_table = TRUE, 
+acs1317 <- get_acs(geography = "tract", state = 51, county = 059, variables = acsvars, year = 2017, survey = "acs5", cache_table = TRUE, 
                    output = "wide", geometry = TRUE, keep_geo_vars = TRUE)
 
 # Calculate variables: rates / % population
-acs_estimates <- acs_est %>% transmute(
+acs_est1317 <- acs1317 %>% transmute(
   GEOID = GEOID,
   STATEFP = STATEFP,
   COUNTYFP = COUNTYFP,
@@ -84,40 +88,182 @@ acs_estimates <- acs_est %>% transmute(
   renters = B25003_003E / B25003_001E,  
   yearbuilt = B25035_001E,
   rentburden = B25071_001E,
-  nointernet = B28011_008E / B28011_001E,
   geometry = geometry
 )
 
-
-#
-# Opportunity zones ---------------------------------------------------------------------------------------------------------------
-#
-
-# Create indicator
+# Create opportunity zone and year ndicators
 # Opportunity zone tracts: 4810, 4821, 4514, 4515.02, 4528.01, 4154.01, 4215, 4216, 4218
+acs_est1317 <- acs_est1317 %>% mutate(opportunity = ifelse((NAME.x == 4810 |
+                                                            NAME.x == 4821 |
+                                                            NAME.x == 4514 |
+                                                            NAME.x == 4515.02 |
+                                                            NAME.x == 4528.01 |
+                                                            NAME.x == 4154.01 |
+                                                            NAME.x == 4215 |
+                                                            NAME.x == 4216 |
+                                                            NAME.x == 4218), 1, 0),
+                                      endyear = 2017)
+table(acs_est1317$opportunity)
+table(acs_est1317$endyear)
 
-acs_estimates <- acs_estimates %>% mutate(opportunity = ifelse((NAME.x == 4810 |
-                                                               NAME.x == 4821 |
-                                                               NAME.x == 4514 |
-                                                               NAME.x == 4515.02 |
-                                                               NAME.x == 4528.01 |
-                                                               NAME.x == 4154.01 |
-                                                               NAME.x == 4215 |
-                                                               NAME.x == 4216 |
-                                                               NAME.x == 4218), 1, 0))
-table(acs_estimates$opportunity)
-
-
-#
-# Write out ---------------------------------------------------------------------------------------------------------------
-#
+# Write out
 
 # With geography
-st_write(acs_estimates, "./data/working/acs_2013-17_tract_calc.shp", driver = "ESRI Shapefile")  # create to a shapefile 
+st_write(acs_est1317, "./data/working/acs1317/acs1317_tract_calc.shp", driver = "ESRI Shapefile")
 
 # Data only
-st_geometry(acs_est) <- NULL
-write.csv(acs_est, file = "./data/original/acs_2013-17/acs_2013-17_tract.csv", row.names = F)
+st_geometry(acs1317) <- NULL
+write.csv(acs1317, file = "./data/original/acs/acs1317_tract.csv", row.names = F)
 
-st_geometry(acs_estimates) <- NULL
-write.csv(acs_estimates, file = "./data/working/acs_2013-17_tract_calc.csv", row.names = F)
+st_geometry(acs_est1317) <- NULL
+write.csv(acs_est1317, file = "./data/working/acs1317/acs1317_tract_calc.csv", row.names = F)
+
+# Clean up
+remove(acs_est1317)
+remove(acs1317)
+
+
+#
+# Get variable data for geography & transform: 2012-16 -------------------------------------------------------------------------------------------------------------
+#
+
+# Get county-level variables from ACS 2012-2016 (5-year)
+acs1216 <- get_acs(geography = "tract", state = 51, county = 059, variables = acsvars, year = 2016, survey = "acs5", cache_table = TRUE, 
+                   output = "wide", geometry = TRUE, keep_geo_vars = TRUE)
+
+# Calculate variables: rates / % population
+acs_est1216 <- acs1216 %>% transmute(
+  GEOID = GEOID,
+  STATEFP = STATEFP,
+  COUNTYFP = COUNTYFP,
+  TRACTCE = TRACTCE,
+  AFFGEOID = AFFGEOID,
+  ALAND = ALAND,
+  AWATER = AWATER,
+  LSAD = LSAD,
+  NAME.x = NAME.x,
+  NAME.y = NAME.y,
+  population = B00001_001E,
+  hs_or_less = (B15003_002E + B15003_003E + B15003_004E + B15003_005E + B15003_006E + B15003_007E + B15003_008E + B15003_009E + B15003_010E +
+                  B15003_011E + B15003_012E + B15003_013E + B15003_014E + B15003_015E + B15003_016E + B15003_017E + B15003_018E) / B15003_001E,
+  poverty = B17020_002E / B17020_001E,
+  age_65_older = (B01001_020E + B01001_021E + B01001_022E + B01001_023E + B01001_024E + B01001_025E +
+                    B01001_044E + B01001_045E + B01001_046E + B01001_047E + B01001_048E + B01001_049E) / B01001_001E,
+  hispanic = B03003_003E / B03003_001E,
+  black = B02001_003E / B02001_001E,
+  family = B09019_003E / B09019_002E,
+  foreign = B05002_013E / B05002_001E,
+  workfromhome = B08006_017E / B08006_001E,     
+  longcommute = (B08303_008E + B08303_009E + B08303_010E + B08303_011E + B08303_012E + B08303_013E) / B08303_001E,
+  assistance = B19058_002E / B19058_001E,
+  laborforce = B23025_002E / B23025_001E,  
+  vacant = B25002_003E / B25002_001E,
+  renters = B25003_003E / B25003_001E,  
+  yearbuilt = B25035_001E,
+  rentburden = B25071_001E,
+  geometry = geometry
+)
+
+# Create opportunity zone and year indicators
+# Opportunity zone tracts: 4810, 4821, 4514, 4515.02, 4528.01, 4154.01, 4215, 4216, 4218
+acs_est1216 <- acs_est1216 %>% mutate(opportunity = ifelse((NAME.x == 4810 |
+                                                            NAME.x == 4821 |
+                                                            NAME.x == 4514 |
+                                                            NAME.x == 4515.02 |
+                                                            NAME.x == 4528.01 |
+                                                            NAME.x == 4154.01 |
+                                                            NAME.x == 4215 |
+                                                            NAME.x == 4216 |
+                                                            NAME.x == 4218), 1, 0),
+                                      endyear = 2016)
+table(acs_est1216$opportunity)
+table(acs_est1216$endyear)
+
+# Write out
+
+# With geography
+st_write(acs_est1216, "./data/working/acs1216/acs1216_tract_calc.shp", driver = "ESRI Shapefile")
+
+# Data only
+st_geometry(acs1216) <- NULL
+write.csv(acs1216, file = "./data/original/acs/acs1216_tract.csv", row.names = F)
+
+st_geometry(acs_est1216) <- NULL
+write.csv(acs_est1216, file = "./data/working/acs1216/acs1216_tract_calc.csv", row.names = F)
+
+# Clean up
+remove(acs_est1216)
+remove(acs1216)
+
+
+#
+# Get variable data for geography & transform: 2011-15 -------------------------------------------------------------------------------------------------------------
+#
+
+# Get county-level variables from ACS 2012-2016 (5-year)
+acs1115 <- get_acs(geography = "tract", state = 51, county = 059, variables = acsvars, year = 2015, survey = "acs5", cache_table = TRUE, 
+                   output = "wide", geometry = TRUE, keep_geo_vars = TRUE)
+
+# Calculate variables: rates / % population
+acs_est1115 <- acs1115 %>% transmute(
+  GEOID = GEOID,
+  STATEFP = STATEFP,
+  COUNTYFP = COUNTYFP,
+  TRACTCE = TRACTCE,
+  AFFGEOID = AFFGEOID,
+  ALAND = ALAND,
+  AWATER = AWATER,
+  LSAD = LSAD,
+  NAME.x = NAME.x,
+  NAME.y = NAME.y,
+  population = B00001_001E,
+  hs_or_less = (B15003_002E + B15003_003E + B15003_004E + B15003_005E + B15003_006E + B15003_007E + B15003_008E + B15003_009E + B15003_010E +
+                  B15003_011E + B15003_012E + B15003_013E + B15003_014E + B15003_015E + B15003_016E + B15003_017E + B15003_018E) / B15003_001E,
+  poverty = B17020_002E / B17020_001E,
+  age_65_older = (B01001_020E + B01001_021E + B01001_022E + B01001_023E + B01001_024E + B01001_025E +
+                    B01001_044E + B01001_045E + B01001_046E + B01001_047E + B01001_048E + B01001_049E) / B01001_001E,
+  hispanic = B03003_003E / B03003_001E,
+  black = B02001_003E / B02001_001E,
+  family = B09019_003E / B09019_002E,
+  foreign = B05002_013E / B05002_001E,
+  workfromhome = B08006_017E / B08006_001E,     
+  longcommute = (B08303_008E + B08303_009E + B08303_010E + B08303_011E + B08303_012E + B08303_013E) / B08303_001E,
+  assistance = B19058_002E / B19058_001E,
+  laborforce = B23025_002E / B23025_001E,  
+  vacant = B25002_003E / B25002_001E,
+  renters = B25003_003E / B25003_001E,  
+  yearbuilt = B25035_001E,
+  rentburden = B25071_001E,
+  geometry = geometry
+)
+
+# Create opportunity zone and year indicators
+# Opportunity zone tracts: 4810, 4821, 4514, 4515.02, 4528.01, 4154.01, 4215, 4216, 4218
+acs_est1115 <- acs_est1115 %>% mutate(opportunity = ifelse((NAME.x == 4810 |
+                                                            NAME.x == 4821 |
+                                                            NAME.x == 4514 |
+                                                            NAME.x == 4515.02 |
+                                                            NAME.x == 4528.01 |
+                                                            NAME.x == 4154.01 |
+                                                            NAME.x == 4215 |
+                                                            NAME.x == 4216 |
+                                                            NAME.x == 4218), 1, 0),
+                                      endyear = 2015)
+table(acs_est1115$opportunity)
+table(acs_est1115$endyear)
+
+# Write out
+
+# With geography
+st_write(acs_est1115, "./data/working/acs1115/acs1115_tract_calc.shp", driver = "ESRI Shapefile")
+
+# Data only
+st_geometry(acs1115) <- NULL
+write.csv(acs1115, file = "./data/original/acs/acs1115_tract.csv", row.names = F)
+
+st_geometry(acs_est1115) <- NULL
+write.csv(acs_est1115, file = "./data/working/acs1115/acs1115_tract_calc.csv", row.names = F)
+
+# Clean up
+remove(acs_est1115)
+remove(acs1115)
