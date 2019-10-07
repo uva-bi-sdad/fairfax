@@ -38,25 +38,76 @@ plot(st_geometry(t4810))
 plot(st_geometry(t4810[t4810$opprtnt == 1, ]), add = TRUE, col = "red")
 plot(st_geometry(t4810[t4810$neighboronly == 1, ]), add = TRUE, col = "blue")
 
-# Drop geography and select variables
-thezones <- list("Zone 4215" = t4215, "Zone 4810" = t4810, "Zone 4216" = t4216, "Zone 4515.02" = t4515_02, "Zone 4528.01" = t4528_01, 
-                 "Zone 4154.01" = t4154_01, "Zone 4218" = t4218, "Zone 4821" = t4821, "Zone 4514" = t4514)
-thezones <- thezones %>% map(~ st_drop_geometry(.x)) %>%
-                         map(~ select(.x, GEOID, NAME_x, NAME_y, popultn, hs_r_ls, poverty, ag_65_l, hispanc, black, family, foreign, 
-                                      wrkfrmh, lngcmmt, assstnc, labrfrc, vacant, renters, yearblt, rntbrdn, opprtnt, endyear, 
-                                      neighbor, neighboronly, type))
+
+#
+# Plot each zone + neighbors --------------------------------------------------------------------
+#
+
+# Write function
+viztract <- function(data2, numtract) {
+  ggplot() +
+    geom_sf(data = acs1317, size = 0.2) +
+    geom_sf(data = data2[data2$neighboronly == 1, ], aes(fill = "#440154")) +
+    geom_sf(data = data2[data2$opprtnt == 1, ], aes(fill = "#FDE725"))  +
+    ggtitle(paste0("Fairfax County Opportunity Zone (OZ) ", numtract, "\nand Non-OZ Neighboring Tracts")) +
+    theme_map() +
+    theme(plot.title = element_text(size = 16, face = "bold"),
+          legend.title = element_text(size = 11, face = "bold"),
+          legend.text = element_text(size = 11),
+          legend.position = c(0.1, 0.1)) +
+    scale_fill_identity(name = "Tract Type", guide = "legend", labels = c("Neighboring Tract", paste0("Opportunity Zone ", numtract)))
+}
+
+# Get plots
+viztract(t4215, "4215")
+ggsave("./docs/opzones/plot4215.png")
+
+viztract(t4810, "4810")
+ggsave("./docs/opzones/plot4810.png")
+
+viztract(t4216, "4216")
+ggsave("./docs/opzones/plot4216.png")
+
+viztract(t4515_02, "4515.02")
+ggsave("./docs/opzones/plot4515_02.png")
+
+viztract(t4528_01, "4528.01")
+ggsave("./docs/opzones/plot4528_01.png")
+
+viztract(t4154_01, "4154.01")
+ggsave("./docs/opzones/plot4154_01.png")
+
+viztract(t4218, "4218")
+ggsave("./docs/opzones/plot4218.png")
+
+viztract(t4821, "4821")
+ggsave("./docs/opzones/plot4821.png")
+
+viztract(t4514, "4514")
+ggsave("./docs/opzones/plot4514.png")
 
 
 #
 # Compare zone with neighbors --------------------------------------------------------------------
 #
 
+
+# Drop geography and select variables
+thezones <- list("Zone 4215" = t4215, "Zone 4810" = t4810, "Zone 4216" = t4216, "Zone 4515.02" = t4515_02, "Zone 4528.01" = t4528_01, 
+                 "Zone 4154.01" = t4154_01, "Zone 4218" = t4218, "Zone 4821" = t4821, "Zone 4514" = t4514)
+thezones <- thezones %>% map(~ st_drop_geometry(.x)) %>%
+  map(~ select(.x, GEOID, NAME_x, NAME_y, popultn, hs_r_ls, poverty, ag_65_l, hispanc, black, family, foreign, 
+               wrkfrmh, lngcmmt, assstnc, labrfrc, vacant, renters, yearblt, rntbrdn, opprtnt, endyear, 
+               neighbor, neighboronly, type))
+
+# Create labels
 mylabels <- list(popultn = "Population", hs_r_ls = "High school or less (prop.)", poverty = "In poverty (prop.)",
                  ag_65_l = "65 or older (prop.)", hispanc = "Hispanic (prop.)", black = "Black (prop.)", family = "Family households (prop.)", 
                  foreign = "Foreign-born (prop.)", wrkfrmh = "Work from home (prop.)", lngcmmt = "Long commute (prop.)", 
                  assstnc = "Receive social assistance (prop.)", labrfrc = "In labor force (prop.)", vacant = "Vacant properties (prop.)",
                  renters = "Renters (prop.)", yearblt = "Median year property built", rntbrdn = "Median rent burdened (prop.)")
 
+# Create tables
 table4215 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
                     lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
                     data = thezones[["Zone 4215"]], 

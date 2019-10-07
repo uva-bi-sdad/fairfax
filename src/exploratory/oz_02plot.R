@@ -72,3 +72,5 @@ ggplot() +
         legend.text = element_text(size = 11),
         legend.position = c(0.1, 0.1)) +
   scale_fill_identity(name = "Tract Type", guide = "legend", labels = c("Neighboring Tract", "Opportunity Zone")) 
+
+ggsave("./docs/opzones/plotall.png")
