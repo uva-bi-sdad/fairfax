@@ -26,22 +26,24 @@ plot(st_geometry(zones[3, ]), col = "red", add = TRUE)
 
 # Create neighbor indicators
 acs1317 <- acs1317 %>% mutate(id = row_number(),
-                              neighbor4215 = ifelse(id %in% neighbors[[1]], 1, 0),
-                              neighbor4810 = ifelse(id %in% neighbors[[2]], 1, 0),
-                              neighbor4216 = ifelse(id %in% neighbors[[3]], 1, 0),
-                              neighbor4515.02 = ifelse(id %in% neighbors[[4]], 1, 0),
-                              neighbor4528.01 = ifelse(id %in% neighbors[[5]], 1, 0),
-                              neighbor4154.01 = ifelse(id %in% neighbors[[6]], 1, 0),
-                              neighbor4218 = ifelse(id %in% neighbors[[7]], 1, 0),
-                              neighbor4821 = ifelse(id %in% neighbors[[8]], 1, 0),
-                              neighbor4514 = ifelse(id %in% neighbors[[9]], 1, 0))
+                              n4215 = ifelse(id %in% neighbors[[1]], 1, 0),
+                              n4810 = ifelse(id %in% neighbors[[2]], 1, 0),
+                              n4216 = ifelse(id %in% neighbors[[3]], 1, 0),
+                              n4515.02 = ifelse(id %in% neighbors[[4]], 1, 0),
+                              n4528.01 = ifelse(id %in% neighbors[[5]], 1, 0),
+                              n4154.01 = ifelse(id %in% neighbors[[6]], 1, 0),
+                              n4218 = ifelse(id %in% neighbors[[7]], 1, 0),
+                              n4821 = ifelse(id %in% neighbors[[8]], 1, 0),
+                              n4514 = ifelse(id %in% neighbors[[9]], 1, 0))
 
 # Test plot
 plot(st_geometry(acs1317), col = "white")
-plot(st_geometry(acs1317[acs1317$neighbor4215 == 1, ]), add = TRUE, col = "blue")
+plot(st_geometry(acs1317[acs1317$n4215 == 1, ]), add = TRUE, col = "blue")
 plot(st_geometry(acs1317[acs1317$NAME_x == 4215, ]), add = TRUE, col = "red")
 
-# Write out (csv because of shp name truncation)
+# Write out 
+st_write(acs1317, "./data/working/acs1317/acs1317_tract_neigh.shp", driver = "ESRI Shapefile")
+st_geometry(acs1317) <- NULL
 write_csv(acs1317, "./data/working/acs1317/acs1317_tract_neigh.csv")
 
 # Clean up
@@ -70,22 +72,24 @@ plot(st_geometry(zones[3, ]), col = "red", add = TRUE)
 
 # Create neighbor indicators
 acs1216 <- acs1216 %>% mutate(id = row_number(),
-                              neighbor4215 = ifelse(id %in% neighbors[[3]], 1, 0),
-                              neighbor4810 = ifelse(id %in% neighbors[[9]], 1, 0),
-                              neighbor4216 = ifelse(id %in% neighbors[[4]], 1, 0),
-                              neighbor4515.02 = ifelse(id %in% neighbors[[7]], 1, 0),
-                              neighbor4528.01 = ifelse(id %in% neighbors[[8]], 1, 0),
-                              neighbor4154.01 = ifelse(id %in% neighbors[[2]], 1, 0),
-                              neighbor4218 = ifelse(id %in% neighbors[[5]], 1, 0),
-                              neighbor4821 = ifelse(id %in% neighbors[[1]], 1, 0),
-                              neighbor4514 = ifelse(id %in% neighbors[[6]], 1, 0))
+                              n4215 = ifelse(id %in% neighbors[[3]], 1, 0),
+                              n4810 = ifelse(id %in% neighbors[[9]], 1, 0),
+                              n4216 = ifelse(id %in% neighbors[[4]], 1, 0),
+                              n4515.02 = ifelse(id %in% neighbors[[7]], 1, 0),
+                              n4528.01 = ifelse(id %in% neighbors[[8]], 1, 0),
+                              n4154.01 = ifelse(id %in% neighbors[[2]], 1, 0),
+                              n4218 = ifelse(id %in% neighbors[[5]], 1, 0),
+                              n4821 = ifelse(id %in% neighbors[[1]], 1, 0),
+                              n4514 = ifelse(id %in% neighbors[[6]], 1, 0))
 
 # Test plot
 plot(st_geometry(acs1216), col = "white")
-plot(st_geometry(acs1216[acs1216$neighbor4215 == 1, ]), add = TRUE, col = "blue")
+plot(st_geometry(acs1216[acs1216$n4215 == 1, ]), add = TRUE, col = "blue")
 plot(st_geometry(acs1216[acs1216$NAME_x == 4215, ]), add = TRUE, col = "red")
 
-# Write out (csv because of shp name truncation)
+# Write out 
+st_write(acs1216, "./data/working/acs1216/acs1216_tract_neigh.shp", driver = "ESRI Shapefile")
+st_geometry(acs1216) <- NULL
 write_csv(acs1216, "./data/working/acs1216/acs1216_tract_neigh.csv")
 
 # Clean up
@@ -114,22 +118,24 @@ plot(st_geometry(zones[3, ]), col = "red", add = TRUE)
 
 # Create neighbor indicators
 acs1115 <- acs1115 %>% mutate(id = row_number(),
-                              neighbor4215 = ifelse(id %in% neighbors[[2]], 1, 0),
-                              neighbor4810 = ifelse(id %in% neighbors[[8]], 1, 0),
-                              neighbor4216 = ifelse(id %in% neighbors[[3]], 1, 0),
-                              neighbor4515.02 = ifelse(id %in% neighbors[[6]], 1, 0),
-                              neighbor4528.01 = ifelse(id %in% neighbors[[7]], 1, 0),
-                              neighbor4154.01 = ifelse(id %in% neighbors[[1]], 1, 0),
-                              neighbor4218 = ifelse(id %in% neighbors[[4]], 1, 0),
-                              neighbor4821 = ifelse(id %in% neighbors[[9]], 1, 0),
-                              neighbor4514 = ifelse(id %in% neighbors[[5]], 1, 0))
+                              n4215 = ifelse(id %in% neighbors[[2]], 1, 0),
+                              n4810 = ifelse(id %in% neighbors[[8]], 1, 0),
+                              n4216 = ifelse(id %in% neighbors[[3]], 1, 0),
+                              n4515.02 = ifelse(id %in% neighbors[[6]], 1, 0),
+                              n4528.01 = ifelse(id %in% neighbors[[7]], 1, 0),
+                              n4154.01 = ifelse(id %in% neighbors[[1]], 1, 0),
+                              n4218 = ifelse(id %in% neighbors[[4]], 1, 0),
+                              n4821 = ifelse(id %in% neighbors[[9]], 1, 0),
+                              n4514 = ifelse(id %in% neighbors[[5]], 1, 0))
 
 # Test plot
 plot(st_geometry(acs1115), col = "white")
-plot(st_geometry(acs1115[acs1115$neighbor4215 == 1, ]), add = TRUE, col = "blue")
+plot(st_geometry(acs1115[acs1115$n4215 == 1, ]), add = TRUE, col = "blue")
 plot(st_geometry(acs1115[acs1115$NAME_x == 4215, ]), add = TRUE, col = "red")
 
-# Write out (csv because of shp name truncation)
+# Write out
+st_write(acs1115, "./data/working/acs1115/acs1115_tract_neigh.shp", driver = "ESRI Shapefile")
+st_geometry(acs1115) <- NULL
 write_csv(acs1115, "./data/working/acs1115/acs1115_tract_neigh.csv")
 
 # Clean up
