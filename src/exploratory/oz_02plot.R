@@ -59,10 +59,6 @@ coords_zone$name <- point_zones$NAME_x
 coords_neighbor <- as.data.frame(st_coordinates(point_neighbors))
 coords_neighbor$name <- point_neighbors$NAME_x
 
-ggplot() +
-  geom_sf(data = nc3, aes(fill = AREA)) +
-  geom_text(data = nc3_coords, aes(X, Y, label = NAME), colour = "white")
-
 # Plot
 ggplot() +
   geom_sf(data = acs1317, size = 0.2) +
