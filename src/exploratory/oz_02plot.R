@@ -62,9 +62,13 @@ coords_neighbor$name <- point_neighbors$NAME_x
 # Plot
 ggplot() +
   geom_sf(data = acs1317, size = 0.2) +
-  geom_sf(data = acs1317[acs1317$neighbor == 1, ], fill = "#440154") +
-  geom_sf(data = acs1317[acs1317$opprtnt == 1, ], fill = "#FDE725")  +
+  geom_sf(data = acs1317[acs1317$neighbor == 1, ], aes(fill = "#440154")) +
+  geom_sf(data = acs1317[acs1317$opprtnt == 1, ], aes(fill = "#FDE725"))  +
   geom_label_repel(data = coords_zone, aes(X, Y, label = name), colour = "black", nudge_x = 3, segment.size = 0.5) + 
   labs(title = "Fairfax County Opportunity Zones and Neighboring Tracts") +
   theme_map() +
-  theme(plot.title = element_text(size = 16, face = "bold"))
+  theme(plot.title = element_text(size = 16, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.1, 0.1)) +
+  scale_fill_identity(name = "Tract Type", guide = "legend", labels = c("Neighboring Tract", "Opportunity Zone")) 
