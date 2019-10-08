@@ -88,7 +88,7 @@ ggsave("./docs/opzones/plot4514.png")
 
 
 #
-# Compare zone with neighbors --------------------------------------------------------------------
+# Compare each zone with neighbors (that are not also zones) --------------------------------------------------------------------
 #
 
 
@@ -122,15 +122,15 @@ table4216 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + bl
                      control = tableby.control(numeric.stats = c("meansd"), digits = 2), numeric.simplify = TRUE) # also show range with "range"
 table4515_02 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
                      lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
-                     data = thezones[["Zone 4515_02"]], 
+                     data = thezones[["Zone 4515.02"]], 
                      control = tableby.control(numeric.stats = c("meansd"), digits = 2), numeric.simplify = TRUE) # also show range with "range"
 table4528_01 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
                         lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
-                        data = thezones[["Zone 4528_01"]], 
+                        data = thezones[["Zone 4528.01"]], 
                         control = tableby.control(numeric.stats = c("meansd"), digits = 2), numeric.simplify = TRUE) # also show range with "range"
 table4154_01 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
                         lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
-                        data = thezones[["Zone 4154_01"]], 
+                        data = thezones[["Zone 4154.01"]], 
                         control = tableby.control(numeric.stats = c("meansd"), digits = 2), numeric.simplify = TRUE) # also show range with "range"
 table4218 <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
                      lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
@@ -155,3 +155,13 @@ summary(table4218, text = TRUE, labelTranslations = mylabels)
 summary(table4821, text = TRUE, labelTranslations = mylabels)
 summary(table4514, text = TRUE, labelTranslations = mylabels)
 
+
+#
+# Compare all zones with neighbors (that are not also zones) --------------------------------------------------------------------
+#
+
+tableall <- tableby(type ~ popultn + hs_r_ls + poverty + ag_65_l + hispanc + black + family + foreign + wrkfrmh + 
+                       lngcmmt + assstnc + labrfrc + vacant + renters + yearblt + rntbrdn, 
+                     data = data[(data$opprtnt == 1 | data$neighboronly == 1), ], 
+                     control = tableby.control(numeric.stats = c("meansd"), digits = 2), numeric.simplify = TRUE) 
+summary(tableall, text = TRUE, labelTranslations = mylabels)
