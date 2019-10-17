@@ -1,0 +1,91 @@
+---
+title: "Fairfax Strategic Plan"
+author: "Brandon L. Kramer"
+date: "10/2/2019"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+rm(list = ls())
+knitr::opts_knit$set(root.dir = "~/Documents/Fairfax:INOVA/Fairfax Datasets")
+for (pkg in c("tidyverse", "igraph", "bibliometrix", "tidytext", "ggplot2", "ggraph", "widyr", "plotly", "stringi", "pdftools", "SnowballC")) {library(pkg, character.only = TRUE)}
+```
+
+In this file, we are examining how [Fairfax County's Strategic Plans](https://www.fairfaxcounty.gov/strategicplan/sites/strategicplan/files/assets/documents/pdf/strategic-plan-preliminary-strategies.pdf). To get a start on understanding how topics (or in this case just words) are related between the various tenets (or EOs) of one section we ran some automated text analysis on this document. This process entailed pulling in the data, unnesting the tokens, removing the stopwords and then examining the bigram relationships between the words that most commonly occur within each of the tenets.   
+
+```{r pulling data and basic word count, warning=FALSE, message=FALSE} 
+# pulling the data
+text_data <- read_csv("ffx_strategic_plan_text.csv") 
+text_data <- as_tibble(text_data) 
+
+# unnesting the tokens 
+strategic_plan <- text_data %>% 
+  group_by(section) %>% 
+  unnest_tokens(word, text) %>%
+  #mutate(word = wordStem(word)) %>%  # for stemming
+  anti_join(stop_words)
+
+# removing the stop words 
+my_stopwords <- tibble(word = c(as.character(1:6), 
+                                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "18", "19", "22", 
+                                "mt", "hnl", "eeg", "ell", "cro", "sspv", "ss", "eo"))
+strategic_plan <- strategic_plan %>% anti_join(my_stopwords)
+
+# getting the word counts 
+word_counts <- strategic_plan %>%
+  count(word, sort = TRUE)
+
+# creating a dataframe of bigrams 
+plan_bigrams <- strategic_plan  %>%
+  unnest_tokens(bigram, word, token = "ngrams", n = 2)
+
+# checking their counts 
+plan_bigrams %>%
+  count(bigram, sort = TRUE)
+
+bigrams_separated <- plan_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+bigrams_filtered <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+bigram_counts <- bigrams_filtered %>% 
+  count(word1, word2, sort = TRUE)
+```
+
+```{r text networks, fig.width=9, fig.height=7}
+set.seed(1234)
+bigram_counts %>%
+  filter(n >= 2) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "#F84C1E") +    #232D4B
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, size = 5,
+                 point.padding = unit(0.4, "lines")) + theme_void()
+```
+
+```{r}
+# and c
+word_counts %>% 
+  filter(word == "equity" | word == "equitable" | 
+         word == "inequity" | word == "equality" | word == "inequality" |
+         word == "diversity" | 
+         word == "inclusion" | word == "inclusivity" | 
+         word == "disparity" | word == "disparities")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

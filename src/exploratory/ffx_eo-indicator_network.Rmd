@@ -1,0 +1,151 @@
+---
+title: "Fairfax EO-Indicator Network"
+author: "Brandon L. Kramer (UVA Biocomplexity Institute, SDAD)"
+date: "10/16/2019"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+rm(list = ls())
+
+# load packages 
+library(tidyverse)
+library(networkD3)
+
+# pull the data 
+# data available at: https://docs.google.com/spreadsheets/d/1025oveOpyS6GZNU--s7_HPITXGe5rN38akOXsRLi0Ac/edit#gid=0
+setwd("~/Documents/Fairfax:INOVA/Strategic Plan Networks/data")
+edgeList <- read_csv("fairfax_eo-indicator_network-data - edgelist.csv")
+nodeListAttributes <- read_csv("fairfax_eo-indicator_network-data - nodelist.csv")
+```
+
+```{r make network}
+# this creates a graph and removes duplicated edges and self-loops 
+gD <- igraph::simplify(igraph::graph.data.frame(edgeList, directed=FALSE))
+
+# after creating that network, we need to construct a nodelist (starting at 0 because networkD3 is like that)
+nodeList <- data.frame(ID = c(0:(igraph::vcount(gD) - 1)), nName = igraph::V(gD)$name)
+
+# then we can assign the node names from the edge list to the nodelist 
+getNodeID <- function(x){
+  which(x == igraph::V(gD)$name) - 1 # to ensure that IDs start at 0
+}
+
+# and finally add them to them back to edgelist
+edgeList <- plyr::ddply(edgeList, .variables = c("eo", "indicator", "weight"), 
+                        function (x) data.frame(eoID = getNodeID(x$eo), 
+                                                indicatorID = getNodeID(x$indicator)))
+
+# next, we will calculate the degree centrality for all the nodes (and multiply them by 25 for visualization purposes)
+nodeList <- cbind(nodeList, nodeDegree=25*igraph::degree(gD, v = igraph::V(gD), mode = "all"))
+
+# we will also calculate the betweenness centrality for all nodes (and multiply them by 100 for visualization purposes)
+betAll <- igraph::betweenness(gD, v = igraph::V(gD), directed = FALSE) / (((igraph::vcount(gD) - 1) * (igraph::vcount(gD)-2)) / 2)
+betAll.norm <- (betAll - min(betAll))/(max(betAll) - min(betAll))
+nodeList <- cbind(nodeList, nodeBetweenness=100*betAll.norm) 
+
+# we also want the dice similarities between all pairs of nodes (although we won't use that in the visualizations below)
+dsAll <- igraph::similarity.dice(gD, vids = igraph::V(gD), mode = "all")
+F1 <- function(x) {data.frame(diceSim = dsAll[x$eoID +1, x$indicatorID + 1])}
+edgeList <- plyr::ddply(edgeList, .variables=c("eo", "indicator", "weight", "eoID", "indicatorID"), 
+                           function(x) data.frame(F1(x)))
+
+# here, we want to add attributes to the nodeList to visualize different dataSources
+nodeAttributes <- nodeListAttributes %>%
+  select(name, label, dataSource) %>% 
+  rename(nName = name)
+nodeList <- plyr::join(nodeList, nodeAttributes, by="nName")
+nodeList <- nodeList %>% remove_rownames %>% column_to_rownames(var="nName")
+
+# and clean things up a little after we are done 
+rm(betAll, betAll.norm, dsAll, F1, getNodeID, gD, nodeAttributes)
+```
+
+```{r visualizing our first network}
+my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Strategic Plan)", 
+                                         "U.S. Census Bureau - Economic Census",
+                                         "U.S. Bureau of Labor Statistics", 
+                                         "U.S. Department of Agriculture - Food Environment Atlas",
+                                         "U.S. Census Bureau - County Business Patterns",
+                                         "Small Area Health Insurance Estimates", 
+                                         "Virginia Behavioral Risk Factor Surveillance System",
+                                         "Virginia Department of Education",
+                                         "Fairfax County Health and Human Services - Economic Self-Sufficiency",
+                                         "American Community Survey", 
+                                         "County Health Rankings", "United For ALICE"]) 
+                                         
+                                 .range(["#881234",
+                                         "#065382", "#065382", "#065382", "#065382", "#065382",
+                                         "#128177" , "#128177", "#128177", "#128177", 
+                                         "#52BF90", "#52BF90"])'
+
+fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info about edges
+                        Nodes = nodeList, # data frame that contains info about nodes
+                        Source = "eoID", # ID of source node 
+                        Target = "indicatorID", # ID of target node
+                        Value = "weight", # value from the edgelist that will be used to value/weight relationship amongst nodes
+                        NodeID = "label", # value from the nodelist that contains node description we want to use (e.g., node name)
+                        Nodesize = "nodeDegree",  # value from the nodelist that contains value we want to use for a node size
+                        Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
+                        opacity = 0.9, # opacity
+                        opacityNoHover = 0.2, # opacity of labels when static
+                        height = 2300, # Size of the plot (vertical)
+                        width = 3300,  # Size of the plot (horizontal)
+                        fontSize = 45, # Font size
+                        fontFamily = "sans-serif",
+                        linkDistance = 200,
+                        radiusCalculation = "Math.sqrt(d.nodesize)+6",
+                        zoom = TRUE, # ability to zoom when click on the node
+                        charge = -185, # repulsion charge
+                        colourScale = my_colors, # the color palette created above 
+                        legend = TRUE) # including a legend 
+
+htmlwidgets::onRender(
+  fn,
+  'function(el, x) { 
+    d3.selectAll(".legend")
+    .style("font-size", "27px")
+    .style("padding", "20px")
+  }'
+)
+
+```
+
+
+htmlwidgets::onRender(
+  fn,
+  'function(el, x) { 
+    d3.selectAll(".legend")
+    .style("font-size", "28px")
+    legendColor.shapePadding("30px");
+  }'
+)
+```
+
+
+
+
+
+
+
+
+Citations 
+
+# citation info: https://www.r-bloggers.com/network-visualization-part-6-d3-and-r-networkd3/
+# https://stackoverflow.com/questions/57396295/add-an-vertex-attribute-to-networkd3-object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
