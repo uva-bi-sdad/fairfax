@@ -55,7 +55,7 @@ bigram_counts <- bigrams_filtered %>%
 
 ```{r text networks, fig.width=9, fig.height=7}
 # then we can map the text network  
-set.seed(1234) 
+set.seed(1234)  
 bigram_counts %>%
   filter(n >= 2) %>%
   graph_from_data_frame() %>%
