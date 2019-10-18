@@ -5,12 +5,21 @@ date: "10/16/2019"
 output: html_document
 ---
 
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
 ```{r setup, include = FALSE}
 rm(list = ls())
 
 # load packages 
 library(tidyverse)
 library(networkD3)
+library(igraph)
 
 # pull the data 
 # data available at: https://docs.google.com/spreadsheets/d/1025oveOpyS6GZNU--s7_HPITXGe5rN38akOXsRLi0Ac/edit#gid=0
@@ -19,7 +28,7 @@ edgeList <- read_csv("fairfax_eo-indicator_network-data - edgelist.csv")
 nodeListAttributes <- read_csv("fairfax_eo-indicator_network-data - nodelist.csv")
 ```
 
-```{r make network}
+```{r make network, echo=FALSE}
 # this creates a graph and removes duplicated edges and self-loops 
 gD <- igraph::simplify(igraph::graph.data.frame(edgeList, directed=FALSE))
 
@@ -37,7 +46,7 @@ edgeList <- plyr::ddply(edgeList, .variables = c("eo", "indicator", "weight"),
                                                 indicatorID = getNodeID(x$indicator)))
 
 # next, we will calculate the degree centrality for all the nodes (and multiply them by 25 for visualization purposes)
-nodeList <- cbind(nodeList, nodeDegree=25*igraph::degree(gD, v = igraph::V(gD), mode = "all"))
+nodeList <- cbind(nodeList, nodeDegree=15*igraph::degree(gD, v = igraph::V(gD), mode = "all"))
 
 # we will also calculate the betweenness centrality for all nodes (and multiply them by 100 for visualization purposes)
 betAll <- igraph::betweenness(gD, v = igraph::V(gD), directed = FALSE) / (((igraph::vcount(gD) - 1) * (igraph::vcount(gD)-2)) / 2)
@@ -50,6 +59,12 @@ F1 <- function(x) {data.frame(diceSim = dsAll[x$eoID +1, x$indicatorID + 1])}
 edgeList <- plyr::ddply(edgeList, .variables=c("eo", "indicator", "weight", "eoID", "indicatorID"), 
                            function(x) data.frame(F1(x)))
 
+# calculating group membership using cluster_walktrap in igraph  
+wc <- cluster_walktrap(gD)
+members <- membership(wc)
+clusters <- igraph_to_networkD3(gD, group = members)
+nodeList <- cbind(nodeList, cluster=clusters$nodes$group) 
+
 # here, we want to add attributes to the nodeList to visualize different dataSources
 nodeAttributes <- nodeListAttributes %>%
   select(name, label, dataSource) %>% 
@@ -58,10 +73,22 @@ nodeList <- plyr::join(nodeList, nodeAttributes, by="nName")
 nodeList <- nodeList %>% remove_rownames %>% column_to_rownames(var="nName")
 
 # and clean things up a little after we are done 
-rm(betAll, betAll.norm, dsAll, F1, getNodeID, gD, nodeAttributes)
+rm(betAll, betAll.norm, dsAll, F1, getNodeID, gD, nodeListAttributes, clusters)
 ```
 
-```{r visualizing our first network}
+## The Relations Between Strategic Plan EOs, Indicators and Datasources
+
+**Visualization Note** First off, in order to see the interactive network, you will need to scroll on the visualization a little bit to center it within the frame. 
+
+**Nodes** Now that you have it centered, you need to know a little about network analysis. All networks are composed of two core components: *nodes and ties*. In this network, the *nodes* correspond to two different entities. The deep red colored nodes are tenets were written in Fairfax County's Strategic Plan to promote the growth of economic opportunity. For short, we call these nodes EOs. The second type of node corresponds to indicators that have been used by other research institutions like [Broadstreet](https://www.broadstreet.io/board/BOARD/collection/Qm9hcmROb2RlOjI0ODE2/Food%20Access%20Report) to examine general trends about the population and resources in the county. 
+
+**Colors** The bluish and greenish colored nodes are all indicators, but they are different colors because they refer to different data types. While the legend tells you the specifics, we wanted to simplify things since there are so many datasources. Dark blue nodes are datasets managed by the US government. The darker teal nodes are datasets managed by the state of Virginia or Fairfax County and the lighter turqoise nodes are datasources managed by private organizations. 
+
+**Ties** When constructing this network, we wanted to know which indicators connect to each of the EOs. Below, the *ties* between the nodes show which indicators can help measure or better understand who could be affected by EO it shares a relation. As you play around with the visualization, there are a couple things that might help you orient this rather complex visualization. 
+
+**Select Results** First, I would suggest mousing over all of the EOs to have some basis for what EOs are advocating. Once you have some familiarity, the next step is to hover over the indicators (in blue and green). You can that some indicators are really well connected, which you can more easily see by the *size* of the node. The most interesting part of the network is the collection of blue and green dots densely connected at the center of the graph. There, we can see that indicators like "Person Who Obtain Skills," "Persons With Improved Language Skills," and several demographic indicators all share connections to several EOs. These findings led us to some other questions (see below).
+
+```{r visualizing our first network, echo=FALSE}
 # creating a color palette for data types 
 my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Strategic Plan)", 
                                          
@@ -83,7 +110,7 @@ my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Str
                                          "Fairfax County Health and Human Services - Economic Self-Sufficiency",
                                          "Fairfax County Health and Human Services - Connected Individuals",
                                          "Fairfax County Health and Human Services - Healthy People",
-                                         "Fairfax County Health and Human Services - Positive Living for Older Adults and Individuals with Disabilities",
+                                         "Fairfax County Health and Human Services - Positive Living",
                                          "Fairfax County Health and Human Services - Sustainable Housing",
                                          
                                           
@@ -108,8 +135,8 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
                         opacity = 0.9, # opacity
                         opacityNoHover = 0.2, # opacity of labels when static
-                        height = 2300, # Size of the plot (vertical)
-                        width = 3300,  # Size of the plot (horizontal)
+                        height = 1800, # Size of the plot (vertical)
+                        width = 2000,  # Size of the plot (horizontal)
                         fontSize = 45, # Font size
                         fontFamily = "sans-serif",
                         linkDistance = networkD3::JS("function(d) { return 125*d.value; }"),
@@ -119,16 +146,16 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         legend = TRUE) # including a legend 
 
 htmlwidgets::onRender(
-  fn,
-  'function(el, x) { 
+  fn, 'function(el, x) { 
     d3.selectAll(".legend")
     .style("font-size", "27px")
-    .style("margin", "1000px 1000px 1000px 1000px")
   }'
 )
 ```
 
-```{r highlighting ffx data in the network}
+**The Importance of Fairfax Datasources** The network visualized below is composed of the same nodes (EOs and indicators) and ties as the graph above. The only difference is that we have highlighted the Fairfax County datasets to show how central they are to pursuing a data-driven approach to EO implementation. In particular, Fairfax County's Health and Human Services data seems to offer a number of informative indicators that could us develop a composite index (or potentially policies) that address more than one EO at a time. 
+
+```{r highlighting ffx data in the network, echo=FALSE}
 # creating a color palette for data types 
 my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Strategic Plan)", 
                                          
@@ -150,7 +177,7 @@ my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Str
                                          "Fairfax County Health and Human Services - Economic Self-Sufficiency",
                                          "Fairfax County Health and Human Services - Connected Individuals",
                                          "Fairfax County Health and Human Services - Healthy People",
-                                         "Fairfax County Health and Human Services - Positive Living for Older Adults and Individuals with Disabilities",
+                                         "Fairfax County Health and Human Services - Positive Living",
                                          "Fairfax County Health and Human Services - Sustainable Housing",
                                          
                                           
@@ -175,8 +202,8 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
                         opacity = 0.9, # opacity
                         opacityNoHover = 0.2, # opacity of labels when static
-                        height = 2300, # Size of the plot (vertical)
-                        width = 3300,  # Size of the plot (horizontal)
+                        height = 1800, # Size of the plot (vertical)
+                        width = 2000,  # Size of the plot (horizontal)
                         fontSize = 45, # Font size
                         fontFamily = "sans-serif",
                         linkDistance = networkD3::JS("function(d) { return 125*d.value; }"),
@@ -195,41 +222,13 @@ htmlwidgets::onRender(
 )
 ```
 
-```{r looking at betweenness centrality}
+**Using Network Analysis to Detect Indicator Clusters for Composite Indices** Speaking of composite indices, there are also network statistics that can help us anlayze different clusters (or communities) of EOs and indicators. Using a community detection algorithm that calculates clusters based on a measure of similarity between nodes that is based on random walks throughout the network (see Pons and Latapy 2006). This analysis shows that there are five larger clusters of indicators that can help us potentially develop composite indices for our CommunityScapes that feed more directly into addressing the EOs. Take a look at these clusters below. 
+
+```{r community detection, echo=FALSE}
 # creating a color palette for data types 
-my_colors <- 'd3.scaleOrdinal() .domain(["Economic Opportunity Outcome (from Strategic Plan)", 
+cluster_colors <- 'd3.scaleOrdinal() .domain(["1", "2", "3", "4", "5"])
                                          
-                                         "U.S. Census Bureau - Economic Census",
-                                         "U.S. Bureau of Labor Statistics", 
-                                         "U.S. Department of Agriculture - Food Environment Atlas",
-                                         "U.S. Census Bureau - County Business Patterns",
-                                         "Small Area Health Insurance Estimates", 
-                                         "American Community Survey",
-                                         "Feeding America",
-                                         "National Center for Education Statistics",
-                                         "Small Area Health Insurance Estimates",
-                                         "U.S. Bureau of Labor Statistics",
-                                         "U.S. Census Bureau",
-                                         
-                                         
-                                         "Virginia Behavioral Risk Factor Surveillance System",
-                                         "Virginia Department of Education",
-                                         "Fairfax County Health and Human Services - Economic Self-Sufficiency",
-                                         "Fairfax County Health and Human Services - Connected Individuals",
-                                         "Fairfax County Health and Human Services - Healthy People",
-                                         "Fairfax County Health and Human Services - Positive Living for Older Adults and Individuals with Disabilities",
-                                         "Fairfax County Health and Human Services - Sustainable Housing",
-                                         
-                                          
-                                         "County Health Rankings", "United For ALICE"]) 
-                                         
-                                 .range(["#881234",
-                                         "#065382", "#065382", "#065382", 
-                                         "#065382", "#065382", "#065382",
-                                         "#065382", "#065382", "#065382", 
-                                         "#128177", "#128177", "#ff4c00" , 
-                                         "#ff4c00", "#ff4c00", "#ff4c00", "#ff4c00",  
-                                         "#52BF90", "#52BF90"])'
+                                 .range(["#881234", "#065382", "#128177", "#52BF90", "#52BF90"])'
 
 # visualizing the network 
 fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info about edges
@@ -238,36 +237,33 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         Target = "indicatorID", # ID of target node
                         Value = "weight", # value from the edgelist that will be used to value/weight relationship amongst nodes
                         NodeID = "label", # value from the nodelist that contains node description we want to use (e.g., node name)
-                        Nodesize = "nodeBetweenness",  # value from the nodelist that contains value we want to use for a node size
-                        Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
+                        Nodesize = "nodeDegree",  # value from the nodelist that contains value we want to use for a node size
+                        Group = "cluster",  # value from the nodelist that contains value we want to use for node color
                         opacity = 0.9, # opacity
                         opacityNoHover = 0.2, # opacity of labels when static
-                        height = 2300, # Size of the plot (vertical)
-                        width = 3300,  # Size of the plot (horizontal)
+                        height = 1800, # Size of the plot (vertical)
+                        width = 2000,  # Size of the plot (horizontal)
                         fontSize = 45, # Font size
                         fontFamily = "sans-serif",
                         linkDistance = networkD3::JS("function(d) { return 125*d.value; }"),
                         zoom = TRUE, # ability to zoom when click on the node
                         charge = -300, # repulsion charge
-                        colourScale = my_colors, # the color palette created above 
+                        colourScale = cluster_colors, # the color palette created above 
                         legend = TRUE) # including a legend 
 
 htmlwidgets::onRender(
-  fn,
-  'function(el, x) { 
+  fn, 'function(el, x) { 
     d3.selectAll(".legend")
     .style("font-size", "27px")
-    .style("margin", "1000px 1000px 1000px 1000px")
   }'
 )
 ```
 
-Citations 
+## Citations 
 
-# citation info: https://www.r-bloggers.com/network-visualization-part-6-d3-and-r-networkd3/
-# https://stackoverflow.com/questions/57396295/add-an-vertex-attribute-to-networkd3-object
-
-
+https://www.r-bloggers.com/network-visualization-part-6-d3-and-r-networkd3/
+https://stackoverflow.com/questions/57396295/add-an-vertex-attribute-to-networkd3-object
+http://emis.ams.org/journals/JGAA/accepted/2006/PonsLatapy2006.10.2.pdf
 
 
 
