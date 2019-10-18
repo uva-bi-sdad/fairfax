@@ -13,7 +13,7 @@ for (pkg in c("tidyverse", "igraph", "bibliometrix", "tidytext", "ggplot2", "ggr
 
 In this file, we are examining how [Fairfax County's Strategic Plans](https://www.fairfaxcounty.gov/strategicplan/sites/strategicplan/files/assets/documents/pdf/strategic-plan-preliminary-strategies.pdf). To get a start on understanding how topics (or in this case just words) are related between the various tenets (or EOs) of one section we ran some automated text analysis on this document. This process entailed pulling in the data, unnesting the tokens, removing the stopwords and then examining the bigram relationships between the words that most commonly occur within each of the tenets.   
 
-```{r pulling data and basic word count, warning=FALSE, message=FALSE} 
+```{r pulling data & bigrams, warning=FALSE, message=FALSE} 
 # pulling the data
 text_data <- read_csv("ffx_strategic_plan_text.csv") 
 text_data <- as_tibble(text_data) 
@@ -54,7 +54,7 @@ bigram_counts <- bigrams_filtered %>%
 ```
 
 ```{r text networks, fig.width=9, fig.height=7}
-# then we can map the text network  
+# then we map the text network  
 set.seed(1234)  
 bigram_counts %>%
   filter(n >= 2) %>%
@@ -66,8 +66,8 @@ bigram_counts %>%
                  point.padding = unit(0.4, "lines")) + theme_void()
 ```
 
-```{r}
-# and c
+```{r inequity-related word counts}
+# and get some basic counts of equity-related words 
 word_counts %>% 
   filter(word == "equity" | word == "equitable" | 
          word == "inequity" | word == "equality" | word == "inequality" |
