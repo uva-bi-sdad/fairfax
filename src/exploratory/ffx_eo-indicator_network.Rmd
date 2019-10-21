@@ -230,8 +230,9 @@ htmlwidgets::onRender(
 
 *Community Detection* Speaking of composite indices, there are also network statistics that can help us anlayze different clusters (or communities) of EOs and indicators. Using a community detection algorithm that calculates clusters based on a measure of similarity between nodes that is based on random walks throughout the network (see Pons and Latapy 2006). This analysis shows that there are four larger clusters of indicators that can help us potentially develop composite indices for our CommunityScapes that feed more directly into addressing the EOs. Take a look at these clusters below. 
 
-*Which EOs cluster together?* 
-* The community detection method clustered five diffents sets of EOs. The largest (deep red) community links EO4, EO5, E06, EO8, EO12, EO13, and EO15. These EOs mostly boil down to generating business growth and teaching more skills to workforce. The variables that are most connected to these EOs include population labels (of under-represented groups), persons who obtain job skills, persons who acquire English speaking skills, (un)employment variables, and variables about who own businesses. In essence, this cluster seems mostly to do with promoting economic mobility by supporting under-represented communities ownership of local businesses.  
+**Which EOs cluster together?** The community detection method clustered five diffents sets of EOs. 
+
+* The largest (deep red) community links EO4, EO5, E06, EO8, EO12, EO13, and EO15. These EOs mostly boil down to generating business growth and teaching more skills to workforce. The variables that are most connected to these EOs include population labels (of under-represented groups), persons who obtain job skills, persons who acquire English speaking skills, (un)employment variables, and variables about who own businesses. In essence, this cluster seems mostly to do with promoting economic mobility by supporting under-represented communities ownership of local businesses.  
 
 * The second biggest cluster (in the darker teal color) is also related to economic mobility, but seems more focused on breaking down barriers and bolstering access to educational resources. The variables in this cluster almost all relate to reading profeciency, education level (e.g. having a GED or degree), and access to internet or other technology resources. 
 
