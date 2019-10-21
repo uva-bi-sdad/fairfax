@@ -86,7 +86,7 @@ rm(betAll, betAll.norm, dsAll, F1, getNodeID, gD, nodeListAttributes, clusters)
 
 **Ties** When constructing this network, we wanted to know which indicators connect to each of the EOs. Below, the *ties* between the nodes show which indicators can help measure or better understand who could be affected by EO it shares a relation. As you play around with the visualization, there are a couple things that might help you orient this rather complex visualization. 
 
-### Initial Results 
+### Network 1: Baseline Results 
 
 First, I would suggest mousing over all of the EOs to have some basis for what EOs are advocating. Once you have some familiarity, the next step is to hover over the indicators (in blue and green). You can that some indicators are really well connected, which you can more easily see by the *size* of the node. The most interesting part of the network is the collection of blue and green dots densely connected at the center of the graph. There, we can see that indicators like "Person Who Obtain Skills," "Persons With Improved Language Skills," and several demographic indicators all share connections to several EOs. These findings led us to some other questions (see below).
 
@@ -136,7 +136,7 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         Nodesize = "nodeDegree",  # value from the nodelist that contains value we want to use for a node size
                         Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
                         opacity = 0.9, # opacity
-                        opacityNoHover = 0.2, # opacity of labels when static
+                        opacityNoHover = 0.05, # opacity of labels when static
                         height = 1800, # Size of the plot (vertical)
                         width = 2000,  # Size of the plot (horizontal)
                         fontSize = 45, # Font size
@@ -155,7 +155,7 @@ htmlwidgets::onRender(
 )
 ```
 
-### The Importance of Fairfax Datasources
+### Network 2: The Importance of Fairfax Datasources
 
 The network visualized below is composed of the same nodes (EOs and indicators) and ties as the graph above. The only difference is that we have highlighted the Fairfax County datasets to show how central they are to pursuing a data-driven approach to EO implementation. In particular, Fairfax County's Health and Human Services data seems to offer a number of informative indicators that could us develop a composite index (or potentially policies) that address more than one EO at a time. 
 
@@ -205,7 +205,7 @@ fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info 
                         Nodesize = "nodeDegree",  # value from the nodelist that contains value we want to use for a node size
                         Group = "dataSource",  # value from the nodelist that contains value we want to use for node color
                         opacity = 0.9, # opacity
-                        opacityNoHover = 0.2, # opacity of labels when static
+                        opacityNoHover = 0.05, # opacity of labels when static
                         height = 1800, # Size of the plot (vertical)
                         width = 2000,  # Size of the plot (horizontal)
                         fontSize = 45, # Font size
@@ -226,36 +226,43 @@ htmlwidgets::onRender(
 )
 ```
 
-### Using Network Analysis to Detect Indicator Clusters for Composite Indices
+### Network 3: Using Network Analysis to Detect Indicator Clusters for Composite Indices
 
-Speaking of composite indices, there are also network statistics that can help us anlayze different clusters (or communities) of EOs and indicators. Using a community detection algorithm that calculates clusters based on a measure of similarity between nodes that is based on random walks throughout the network (see Pons and Latapy 2006). This analysis shows that there are five larger clusters of indicators that can help us potentially develop composite indices for our CommunityScapes that feed more directly into addressing the EOs. Take a look at these clusters below. 
+*Community Detection* Speaking of composite indices, there are also network statistics that can help us anlayze different clusters (or communities) of EOs and indicators. Using a community detection algorithm that calculates clusters based on a measure of similarity between nodes that is based on random walks throughout the network (see Pons and Latapy 2006). This analysis shows that there are four larger clusters of indicators that can help us potentially develop composite indices for our CommunityScapes that feed more directly into addressing the EOs. Take a look at these clusters below. 
+
+*Which EOs cluster together?* 
+* The community detection method clustered five diffents sets of EOs. The largest (deep red) community links EO4, EO5, E06, EO8, EO12, EO13, and EO15. These EOs mostly boil down to generating business growth and teaching more skills to workforce. The variables that are most connected to these EOs include population labels (of under-represented groups), persons who obtain job skills, persons who acquire English speaking skills, (un)employment variables, and variables about who own businesses. In essence, this cluster seems mostly to do with promoting economic mobility by supporting under-represented communities ownership of local businesses.  
+
+* The second biggest cluster (in the darker teal color) is also related to economic mobility, but seems more focused on breaking down barriers and bolstering access to educational resources. The variables in this cluster almost all relate to reading profeciency, education level (e.g. having a GED or degree), and access to internet or other technology resources. 
+
+* The third and fourth largest communities (in the lighter turquoise and light/dark blue colors) are mostly notable in that they are much less connected to the rest of the graphs. This tells us that the variables available us do not help us understand these EOs as much. 
 
 ```{r community detection, echo=FALSE}
 # creating a color palette for data types 
 cluster_colors <- 'd3.scaleOrdinal() .domain(["1", "2", "3", "4", "5"])
                                          
-                                 .range(["#881234", "#065382", "#128177", "#52BF90", "#52BF90"])'
+                                 .range(["#881234", "#065382", "#128177", "#52BF90", "#2796CE"])'
 
 # visualizing the network 
-fn <- networkD3::forceNetwork(Links = edgeList, # data frame that contains info about edges
-                        Nodes = nodeList, # data frame that contains info about nodes
-                        Source = "eoID", # ID of source node 
-                        Target = "indicatorID", # ID of target node
-                        Value = "weight", # value from the edgelist that will be used to value/weight relationship amongst nodes
-                        NodeID = "label", # value from the nodelist that contains node description we want to use (e.g., node name)
-                        Nodesize = "nodeDegree",  # value from the nodelist that contains value we want to use for a node size
-                        Group = "cluster",  # value from the nodelist that contains value we want to use for node color
-                        opacity = 0.9, # opacity
-                        opacityNoHover = 0.2, # opacity of labels when static
-                        height = 1800, # Size of the plot (vertical)
-                        width = 2000,  # Size of the plot (horizontal)
-                        fontSize = 45, # Font size
+fn <- networkD3::forceNetwork(Links = edgeList, 
+                        Nodes = nodeList, 
+                        Source = "eoID", 
+                        Target = "indicatorID", 
+                        Value = "weight", 
+                        NodeID = "label", 
+                        Nodesize = "nodeDegree",  
+                        Group = "cluster",  
+                        opacity = 0.9, 
+                        opacityNoHover = 0.05, 
+                        height = 1800, 
+                        width = 2000, 
+                        fontSize = 45, 
                         fontFamily = "sans-serif",
                         linkDistance = networkD3::JS("function(d) { return 125*d.value; }"),
-                        zoom = TRUE, # ability to zoom when click on the node
-                        charge = -300, # repulsion charge
-                        colourScale = cluster_colors, # the color palette created above 
-                        legend = TRUE) # including a legend 
+                        zoom = TRUE, 
+                        charge = -300,
+                        colourScale = cluster_colors,  
+                        legend = TRUE) 
 
 htmlwidgets::onRender(
   fn, 'function(el, x) { 
