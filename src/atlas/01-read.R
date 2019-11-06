@@ -1,15 +1,18 @@
 library(readr)
 library(dplyr)
-
+library(downloader)
 
 #
 # Get data & filter ----------------------------------------------------------------------------------------------------
 #
 
+# Unzip
+unzip ("./data/original/atlas/tract_outcomes.zip", exdir = "./data/original/atlas/")
+
 # Import (note outcomes will take a while)
 hhinc_jail <- read_csv("./data/original/atlas/hhinc_jail.csv", progress = show_progress())
 neighb_chars <- read_csv("./data/original/atlas/neighb_chars.csv", progress = show_progress())
-outcomes <- read_csv("./data/original/atlas/outcomes.csv", progress = show_progress())
+outcomes <- read_csv("./data/original/atlas/tract_outcomes_early.csv", progress = show_progress(), col_names = TRUE, cols(czname = "c", .default = col_double()))
 
 # Filter to Fairfax County and Fairfax City
 # Files contain 2010 county FIPS codes. Reference:
