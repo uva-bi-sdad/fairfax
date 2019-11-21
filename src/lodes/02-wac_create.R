@@ -1,7 +1,6 @@
 library(readr)
 library(dplyr)
 library(tigris)
-library(ggplot2)
 library(sf)
 library(stringr)
 library(tidyselect)
@@ -73,8 +72,10 @@ wac09_ffx_tract <- wac09_ffx %>% arrange(trct) %>%
                                                            job09_educlesshs = sum(CD01, na.rm = TRUE)/job09_all,
                                                            job09_educhsequiv = sum(CD02, na.rm = TRUE)/job09_all,
                                                            job09_educsomecol = sum(CD03, na.rm = TRUE)/job09_all,
+                                                           job09_educba = sum(CD04, na.rm = TRUE)/job09_all,
                                                            job09_male = sum(CS01, na.rm = TRUE)/job09_all,
-                                                           job09_female = sum(CS02, na.rm = TRUE)/job09_all)
+                                                           job09_female = sum(CS02, na.rm = TRUE)/job09_all) %>%
+                                 ungroup()
 
 # Select relevant columns 
 wac09_ffx_tract <- wac09_ffx_tract %>% select(cty, ctyname, trct, trctname, starts_with("job09_"))
@@ -89,26 +90,28 @@ wac09_ffx_tract <- wac09_ffx_tract %>% group_by(trct) %>% slice(1)
 
 # Calculate proportion of total jobs by category variables
 wac17_ffx_tract <- wac17_ffx %>% arrange(trct) %>%
-  group_by(trct) %>% mutate(job17_all = sum(C000, na.rm = TRUE),
-                            job17_age29less = sum(CA01, na.rm = TRUE)/job17_all,
-                            job17_age3054 = sum(CA02, na.rm = TRUE)/job17_all,
-                            job17_age55ovr = sum(CA03, na.rm = TRUE)/job17_all,
-                            job17_earn1250less = sum(CE01, na.rm = TRUE)/job17_all,
-                            job17_earn12513333 = sum(CE01, na.rm = TRUE)/job17_all,
-                            job17_earn3334ovr = sum(CE01, na.rm = TRUE)/job17_all,
-                            job17_white = sum(CR01, na.rm = TRUE)/job17_all,
-                            job17_black = sum(CR02, na.rm = TRUE)/job17_all,
-                            job17_native = sum(CR03, na.rm = TRUE)/job17_all,
-                            job17_asian = sum(CR04, na.rm = TRUE)/job17_all,
-                            job17_pacific = sum(CR05, na.rm = TRUE)/job17_all,
-                            job17_multirace = sum(CR07, na.rm = TRUE)/job17_all,
-                            job17_nonhisp = sum(CT01, na.rm = TRUE)/job17_all,
-                            job17_hisp = sum(CT02, na.rm = TRUE)/job17_all,
-                            job17_educlesshs = sum(CD01, na.rm = TRUE)/job17_all,
-                            job17_educhsequiv = sum(CD02, na.rm = TRUE)/job17_all,
-                            job17_educsomecol = sum(CD03, na.rm = TRUE)/job17_all,
-                            job17_male = sum(CS01, na.rm = TRUE)/job17_all,
-                            job17_female = sum(CS02, na.rm = TRUE)/job17_all)
+                                 group_by(trct) %>% mutate(job17_all = sum(C000, na.rm = TRUE),
+                                                           job17_age29less = sum(CA01, na.rm = TRUE)/job17_all,
+                                                           job17_age3054 = sum(CA02, na.rm = TRUE)/job17_all,
+                                                           job17_age55ovr = sum(CA03, na.rm = TRUE)/job17_all,
+                                                           job17_earn1250less = sum(CE01, na.rm = TRUE)/job17_all,
+                                                           job17_earn12513333 = sum(CE01, na.rm = TRUE)/job17_all,
+                                                           job17_earn3334ovr = sum(CE01, na.rm = TRUE)/job17_all,
+                                                           job17_white = sum(CR01, na.rm = TRUE)/job17_all,
+                                                           job17_black = sum(CR02, na.rm = TRUE)/job17_all,
+                                                           job17_native = sum(CR03, na.rm = TRUE)/job17_all,
+                                                           job17_asian = sum(CR04, na.rm = TRUE)/job17_all,
+                                                           job17_pacific = sum(CR05, na.rm = TRUE)/job17_all,
+                                                           job17_multirace = sum(CR07, na.rm = TRUE)/job17_all,
+                                                           job17_nonhisp = sum(CT01, na.rm = TRUE)/job17_all,
+                                                           job17_hisp = sum(CT02, na.rm = TRUE)/job17_all,
+                                                           job17_educlesshs = sum(CD01, na.rm = TRUE)/job17_all,
+                                                           job17_educhsequiv = sum(CD02, na.rm = TRUE)/job17_all,
+                                                           job17_educsomecol = sum(CD03, na.rm = TRUE)/job17_all,
+                                                           job17_educba = sum(CD04, na.rm = TRUE)/job17_all,
+                                                           job17_male = sum(CS01, na.rm = TRUE)/job17_all,
+                                                           job17_female = sum(CS02, na.rm = TRUE)/job17_all) %>%
+                                  ungroup()
 
 # Select relevant columns 
 wac17_ffx_tract <- wac17_ffx_tract %>% select(cty, ctyname, trct, trctname, starts_with("job17_"))
@@ -133,11 +136,9 @@ wac0917 <- left_join(wac09_ffx_tract, wac17_ffx_tract, by = c("cty", "ctyname", 
 # Join data with geography
 wac0917geo <- left_join(ffxcounty, wac0917, by = c("GEOID" = "trct"))
 
-
-#
-# Plot! ---------------------------------------------------------
-#
-
+# Check CRS
+st_crs(wac0917geo)
+wac0917geo <- wac0917geo %>% st_transform("+proj=longlat +datum=WGS84")
 
 
 
