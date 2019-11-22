@@ -48,7 +48,8 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
-  
+ggsave("./docs/lodes/chg_female.png")
+
 # Hispanic
 ggplot(data = change) +
   geom_sf(aes(fill = chg_hisp), size = 0.001) +
@@ -60,6 +61,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_hispanic.png")
 
 # Black
 ggplot(data = change) +
@@ -72,6 +74,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_black.png")
 
 # $3,334
 ggplot(data = change) +
@@ -84,6 +87,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_earn3333.png")
 
 # $1,251 - 3,333
 ggplot(data = change) +
@@ -96,6 +100,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_earn12513333.png")
 
 # <$1,250
 ggplot(data = change) +
@@ -108,6 +113,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_earn1250.png")
 
 # <HS
 ggplot(data = change) +
@@ -120,6 +126,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_educlesshs.png")
 
 # HS
 ggplot(data = change) +
@@ -132,6 +139,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_educhs.png")
 
 # Some college
 ggplot(data = change) +
@@ -144,6 +152,7 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_educsomecoll.png")
 
 # BA+
 ggplot(data = change) +
@@ -156,3 +165,4 @@ ggplot(data = change) +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_viridis_c(name = "Proportion change", limits = c(-0.3, 0.3), breaks = c(-0.3, -0.15, 0, 0.15, 0.3))
+ggsave("./docs/lodes/chg_educba.png")
