@@ -1,0 +1,863 @@
+---
+title: "Mapping the Fairfax County Youth Survey"
+author: "Brandon L. Kramer"
+date: "11/21/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_knit$set(root.dir = "~/home/sdad/project_data/ffx")
+for (pkg in c("igraph", "tidytext", "ggplot2", "sf", "sp", "raster", "readr", "dplyr", 
+              "psych", "ggthemes", "gridExtra", "grid", "normalr", "viridis", "GPArotation")) {library(pkg, character.only = TRUE)}
+
+setwd("/home/sdad/project_data/ffx/fairfax-2019/original/ffxyouth")
+youth_survey <- read_csv("2017_8_10_12_Youth_Survey.csv")
+setwd("/home/sdad/project_data/ffx/fairfax-2019/original/attendance")
+shp_files <- st_read("High_School_Attendance_Areas.shp")
+head(youth_survey)
+youth_survey$PYRAMID_CODE
+youth_survey <- youth_survey %>% 
+  mutate(SCHOOL_NAM = recode(PYRAMID_CODE, 
+                             `1` = 'ANNANDALE', `2` = 'CENTREVILLE', `3` = 'CHANTILLY', `4` = 'EDISON', `5` = 'FAIRFAX',
+                             `6` = 'FALLS CHURCH', `7` = 'HAYFIELD', `8` = 'HERNDON', `9` = 'THOMAS JEFFERSON', `10` = 'LAKE BRADDOCK',
+                             `11` = 'LANGLEY', `12` = 'LEE', `13` = 'MADISON', `14` = 'MARSHALL', `15` = 'MCLEAN', 
+                             `16` = 'MOUNT VERNON', `17` = 'OAKTON', `18` = 'ROBINSON', `19` = 'SOUTH COUNTY', `20` = 'SOUTH LAKES', 
+                             # STUART COUNTY WAS RE-NAMED JUSTICE COUNTY RECENTLY BC J.E.B. STUART WAS A CONFEDERATE SOLDIER 
+                             `21` = 'JUSTICE',`22` = 'WEST POTOMAC', `23` = 'WEST SPRINGFIELD', `24` = 'WESTFIELD', `25` = 'WOODSON')) %>% 
+  rename(school_zone = SCHOOL_NAM)
+youth_survey_copy <- youth_survey
+```
+
+# Final Visual 
+
+```{r factor analysis}
+
+# FACTOR ANALYSIS 
+
+ys_all_qtd <- youth_survey_copy %>% select(PC1,PC11,PC2,PF4,PF9,PS3,PS5,PS6,PS7,PS8)
+
+youth_std <- data.frame(scale(ys_all_qtd, center = TRUE, scale = TRUE))
+describe(youth_std)
+
+cormat <- cor(youth_std, use = "na.or.complete")
+
+fact1 <- fa(r = cormat, nfactors = 1, rotate = "oblimin", fm = "ml")
+fact1
+print(fact1$loadings, cutoff = 0.5)
+fa.diagram(fact1, cut = 0.5)
+
+psych::alpha(youth_std)
+
+```
+
+
+```{r mapping social support index}
+# start from here 
+
+normalize <- function(x) {
+  return ((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)))}
+
+ys_all_qtd <- youth_survey_copy %>% 
+  select(PC1,PC11,PC2,PF4,PF9,PS3,PS5,PS6,PS7,PS8,school_zone) %>% 
+  mutate(PC1 = scale(PC1)) %>% mutate(PC11 = scale(PC11)) %>% mutate(PC2 = scale(PC2)) %>% mutate(PF4 = scale(PF4)) %>% mutate(PF9 = scale(PF9)) %>% 
+  mutate(PS3 = scale(PS3)) %>% mutate(PS5 = scale(PS5)) %>% mutate(PS6 = scale(PS6)) %>%   mutate(PS7 = scale(PS7)) %>% mutate(PS8 = scale(PS8)) %>%
+  mutate(PC1 = normalize(PC1)) %>% mutate(PC11 = normalize(PC11)) %>% mutate(PC2 = normalize(PC2)) %>% mutate(PF4 = normalize(PF4)) %>% mutate(PF9 = normalize(PF9)) %>% 
+  mutate(PS3 = normalize(PS3)) %>% mutate(PS5 = normalize(PS5)) %>% mutate(PS6 = normalize(PS6)) %>%   mutate(PS7 = normalize(PS7)) %>% mutate(PS8 = normalize(PS8)) %>%
+  group_by(school_zone) %>%
+  mutate(support_sum = PC1+PC11+PC2+PF4+PF9+PS3+PS5+PS6+PS7+PS8) %>%
+  summarise(total_support = mean(support_sum, na.rm = TRUE)) %>% 
+  mutate(total_support = normalize(total_support))
+
+mapping_dataset <- shp_files %>% 
+  rename(school_zone = SCHOOL_NAM) %>% 
+  right_join(ys_all_qtd, by = "school_zone")
+
+describe(mapping_dataset$total_support)
+
+ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=total_support), size=0.001) +  
+  labs(title = "Perceived Social Support Among Fairfax County Youth", 
+       caption = "Source: Composite Index of 10 Indicators \nfrom Fairfax County Youth Survey (2017)") +
+  #theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank(),
+        plot.title = element_text(size = 12, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.position = c(0.07, 0.14)) + 
+  scale_fill_viridis_c(name = "Social\nSupport", limits = c(0,1), breaks = c(0,1), labels=c("Less","More"))
+
+```
+
+# Exploratory Anaylses  
+
+```{r creating many indices}
+normalize <- function(x) {
+  return ((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)))}
+
+# SOCIAL INVOLVEMENT (Proxy for Privilege?)
+
+# descriptives 
+describe(youth_survey$C11)
+describe(youth_survey$C13) # too much kutosis 
+describe(youth_survey$C2)
+describe(youth_survey$PI9)  # too much kutosis 
+
+# On an average school day, how many hours do you spend doing homework outside of school? (1=None, 6= 3+ hours)
+school_involvement <- youth_survey %>%
+  mutate(C11 = scale(C11)) %>% 
+  mutate(C11 = normalize(C11)) %>% 
+  group_by(school_zone) %>%
+  summarise(school_involvement = mean(C11, na.rm = TRUE))
+
+# On an average school day, how many hours do you spend staying after school to participate in a team, club, program, etc.? (1=None, 6= 3+ hours)
+team_involvement <- youth_survey %>%
+  mutate(C13 = scale(C13)) %>% 
+  mutate(C13 = normalize(C13)) %>% 
+  group_by(school_zone) %>%
+  summarise(team_involvement = mean(C13, na.rm = TRUE)) 
+
+# How many times have you volunteered to do community service? (1=None, 6= 3+ hours)
+volunteer_involvement <- youth_survey %>%
+  mutate(C2 = scale(C2)) %>% 
+  mutate(C2 = normalize(C2)) %>% 
+  group_by(school_zone) %>%
+  summarise(volunteer_involvement = mean(C2, na.rm = TRUE)) 
+
+# How often do you attend religious services or activities? (1=None, 6= 3+ hours)
+religious_involvement <- youth_survey %>%
+  mutate(PI9 = scale(PI9)) %>% 
+  mutate(PI9 = normalize(PI9)) %>% 
+  group_by(school_zone) %>%
+  summarise(religious_involvement = mean(PI9, na.rm = TRUE))  
+
+youth_survey <- youth_survey %>% 
+  mutate(C11S = scale(C11)) %>% 
+  mutate(C13S = scale(C13)) %>% 
+  mutate(C2S = scale(C2)) %>% 
+  mutate(PI9S = scale(PI9)) %>% 
+  mutate(involvement_sum = C11S + C13S + C2S + PI9S) %>%
+  mutate(involvement_sum = normalize(involvement_sum))
+
+total_involvement <- youth_survey %>%
+  group_by(school_zone) %>%
+  summarise(total_involvement = mean(involvement_sum, na.rm = TRUE))
+
+# Aggregating Across 
+total_involvement <- school_involvement %>% 
+  right_join(team_involvement, by = "school_zone") %>% 
+  right_join(volunteer_involvement, by = "school_zone") %>% 
+  right_join(religious_involvement, by = "school_zone") %>% 
+  right_join(total_involvement, by = "school_zone")
+rm(school_involvement, team_involvement, volunteer_involvement, religious_involvement)
+
+# SOCIAL SUPPORT 
+
+# no skew, no kurtosis, no outliers 
+describe(youth_survey$PC1)
+describe(youth_survey$PC2)
+describe(youth_survey$PF4)
+describe(youth_survey$PF9)
+describe(youth_survey$PS3)
+describe(youth_survey$PS5)
+describe(youth_survey$PS7)
+describe(youth_survey$PS8)
+
+# My neighbors notice when I am doing a good job and let me know about it. (NO,no,yes,YES)
+neighbors_notice <- youth_survey %>% 
+  mutate(PC1 = scale(PC1)) %>% 
+  mutate(PC1 = normalize(PC1)) %>%
+  group_by(school_zone) %>% 
+  summarise(neighbors_notice = mean(PC1, na.rm = TRUE)) 
+
+# There are lots of adults in my neighborhood I could talk to about something important (NO,no,yes,YES)
+neighbor_support <- youth_survey %>%
+  mutate(PC2 = scale(PC2)) %>% 
+  mutate(PC2 = normalize(PC2)) %>%
+  group_by(school_zone) %>% 
+  summarise(neighbor_support = mean(PC2, na.rm = TRUE)) 
+
+# My parents ask me what I think before most family decisions affecting me are made. (NO,no,yes,YES)
+parents_involve_me <- youth_survey %>% 
+  mutate(PF4 = scale(PF4)) %>% 
+  mutate(PF4 = normalize(PF4)) %>%
+  group_by(school_zone) %>% 
+  summarise(parents_involve_me = mean(PF4, na.rm = TRUE))
+
+# If I had a personal problem, I could ask my mom or dad for help. (NO,no,yes,YES)
+parents_support <- youth_survey %>% 
+  mutate(PF9 = scale(PF9)) %>% 
+  mutate(PF9 = normalize(PF9)) %>%
+  group_by(school_zone) %>% 
+  summarise(parents_support = mean(PF9, na.rm = TRUE))
+
+# My teacher notices when I am doing a good job and lets me know about it. (NO,no,yes,YES)
+teachers_notice <- youth_survey %>% 
+  mutate(PS3 = scale(PS3)) %>% 
+  mutate(PS3 = normalize(PS3)) %>%
+  group_by(school_zone) %>% 
+  summarise(teachers_notice = mean(PS3, na.rm = TRUE))
+
+# There are lots of chances for students at my school to talk with a teacher one-on-one. (NO,no,yes,YES)
+teachers_available <- youth_survey %>% 
+  mutate(PS5 = scale(PS5)) %>% 
+  mutate(PS5 = normalize(PS5)) %>%
+  group_by(school_zone) %>% 
+  summarise(teachers_available = mean(PS5, na.rm = TRUE))
+
+# The school lets my parents know when I have done something well. (NO,no,yes,YES)
+teacher_parent_comm <- youth_survey %>% 
+  mutate(PS7 = scale(PS7)) %>% 
+  mutate(PS7 = normalize(PS7)) %>%
+  group_by(school_zone) %>% 
+  summarise(teacher_parent_comm = mean(PS7, na.rm = TRUE))
+
+# My teachers praise me when I have done well in school. (NO,no,yes,YES)
+teacher_praise <- youth_survey %>% 
+  mutate(PS8 = scale(PS8)) %>% 
+  mutate(PS8 = normalize(PS8)) %>%
+  group_by(school_zone) %>% 
+  summarise(teacher_praise = mean(PS8, na.rm = TRUE))
+
+youth_survey <- youth_survey %>% 
+  #mutate(PC1 = scale(PC1)) %>% 
+  mutate(PC2 = scale(PC2)) %>% 
+  #mutate(PF4 = scale(PF4)) %>% 
+  #mutate(PF9 = scale(PF9)) %>% 
+  mutate(PS3 = scale(PS3)) %>% 
+  #mutate(PS5 = scale(PS5)) %>% 
+  mutate(PS7 = scale(PS7)) %>% 
+  mutate(PS8 = scale(PS8)) %>% 
+  mutate(support_factor = PC2 + PS3 + PS7 + PS8) %>%
+  mutate(support_factor = normalize(support_factor)) 
+
+total_support <- youth_survey %>%
+  group_by(school_zone) %>%
+  summarise(total_support = mean(support_factor, na.rm = TRUE))
+
+# Aggregating Across 
+social_support <- neighbors_notice %>% 
+  right_join(neighbor_support, by = "school_zone") %>% 
+  right_join(parents_involve_me, by = "school_zone") %>% 
+  right_join(parents_support, by = "school_zone") %>% 
+  right_join(teachers_notice, by = "school_zone") %>% 
+  right_join(teachers_available, by = "school_zone") %>% 
+  right_join(teacher_parent_comm, by = "school_zone") %>% 
+  right_join(teacher_praise, by = "school_zone") %>% 
+  right_join(total_support, by = "school_zone")
+rm(neighbors_notice, neighbor_support, parents_involve_me, parents_support,
+   teachers_notice, teachers_available, teacher_parent_comm, teacher_praise)
+
+# STRESS, SLEEP, SAFETY AND HOUSING STABILITY  
+
+describe(youth_survey$M5)
+describe(youth_survey$H20)
+describe(youth_survey$PS6) # kurtosis 
+describe(youth_survey$RC19)
+describe(youth_survey$RC17)
+
+# On a scale of 1 to 10 where 1 means you have “little or no stress” and 10 means you have “a great deal of stress,” 
+# how would you rate your average level of stress during the past month?
+stress <- youth_survey %>%
+  mutate(M5 = scale(M5)) %>% 
+  mutate(M5 = normalize(M5)) %>%
+  group_by(school_zone) %>%
+  summarise(stress = mean(M5, na.rm = TRUE))
+
+# On an average school night, how many hours of sleep do you get? (Reverse coded to mean >> 10 hours or more = 1, 7 = 4 or less hours)
+sleep <- youth_survey %>%
+  mutate(H20R = recode(H20, `1` = 7, `2` = 6, `3` = 5, `4` = 4, `5` = 3, `6` = 2, `7` = 1)) %>% 
+  mutate(H20R = scale(H20R)) %>% 
+  mutate(H20R = normalize(H20R)) %>%
+  group_by(school_zone) %>%
+  summarise(sleep = mean(H20R, na.rm = TRUE)) 
+  
+# I feel safe at my school. (Reverse coded TO BE YES,yes,no,NO)
+school_safety <- youth_survey %>%
+  mutate(PS6R = recode(PS6, `1` = 4, `2` = 3, `3` = 2, `4` = 1)) %>%
+  mutate(PS6R = scale(PS6R)) %>% 
+  mutate(PS6R = normalize(PS6R)) %>%
+  group_by(school_zone) %>%
+  summarise(school_safety = mean(PS6R, na.rm = TRUE))
+
+# I feel safe in my neighborhood, or the area around where I live. (Reverse coded TO BE YES,yes,no,NO)
+nhood_safety <- youth_survey %>%
+  mutate(RC19R = recode(RC19, `1` = 4, `2` = 3, `3` = 2, `4` = 1)) %>%
+  mutate(RC19R = scale(RC19R)) %>% 
+  mutate(RC19R = normalize(RC19R)) %>%
+  group_by(school_zone) %>%
+  summarise(nhood_safety = mean(RC19R, na.rm = TRUE))
+
+# RC17: Number of Times Moved Since Kindergarten (1=None, 5=7 or more times)
+times_moved <- youth_survey %>% 
+  mutate(RC17 = scale(RC17)) %>% 
+  mutate(RC17 = normalize(RC17)) %>%
+  group_by(school_zone) %>% 
+  summarise(times_moved = mean(RC17, na.rm = TRUE)) 
+
+youth_survey <- youth_survey %>% 
+  mutate(M5 = scale(M5)) %>%
+  mutate(H20 = scale(H20)) %>%
+  mutate(PS6 = scale(PS6)) %>%
+  mutate(RC19 = scale(RC19)) %>%
+  mutate(RC17 = scale(RC17)) %>%
+  mutate(stress_sum = M5 + H20 + PS6 + RC19 + RC17) %>% 
+  mutate(stress_sum = normalize(stress_sum))
+
+total_stress <- youth_survey %>%
+  group_by(school_zone) %>%
+  summarise(total_stress = mean(stress_sum, na.rm = TRUE))
+
+stress_safety <- stress %>% 
+  right_join(sleep, by = "school_zone") %>% 
+  right_join(school_safety, by = "school_zone") %>% 
+  right_join(nhood_safety, by = "school_zone") %>% 
+  right_join(times_moved, by = "school_zone") %>% 
+  right_join(total_stress, by = "school_zone")
+rm(stress, sleep, school_safety, nhood_safety, times_moved)
+
+# PERCEIVED DIFFERENCE SCALE 
+
+describe(youth_survey$LS15) # skew and kurtosis 
+describe(youth_survey$B10A) # skew and kurtosis 
+describe(youth_survey$B2A)  # skew and kurtosis 
+
+# I get along well with students who are different from me. (1 = Agree, 5 = Strongly Disagree)
+get_along_diffppl <- youth_survey %>%
+  #mutate(LS15R = recode(LS15, `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5` = 1)) %>%
+  mutate(LS15 = scale(LS15)) %>% 
+  mutate(LS15 = normalize(LS15)) %>%
+  group_by(school_zone) %>%
+  summarise(get_along_diffppl = mean(LS15, na.rm = TRUE)) 
+
+get_along_diffpplR <- youth_survey %>%
+  mutate(LS15R = recode(LS15, `1` = 5, `2` = 4, `3` = 3, `4` = 2, `5` = 1)) %>%
+  mutate(LS15R = scale(LS15R)) %>% 
+  mutate(LS15R = normalize(LS15R)) %>%
+  group_by(school_zone) %>%
+  summarise(get_along_diffpplR = mean(LS15R, na.rm = TRUE)) 
+
+# How many times in the past year has anyone done any of the following TO YOU: said something bad about your race or culture? (1=Never, 8=40+ times)
+personal_racism <- youth_survey %>%
+  mutate(B10A = scale(B10A)) %>% 
+  mutate(B10A = normalize(B10A)) %>%
+  group_by(school_zone) %>%
+  summarise(personal_racism = mean(B10A, na.rm = TRUE))
+  
+# How many times in the past year have you said something bad about someone's race or culture? (1=Never, 8=40+ times)
+general_racism <- youth_survey %>%
+  mutate(B2A = scale(B2A)) %>% 
+  mutate(B2A = normalize(B2A)) %>%
+  group_by(school_zone) %>%
+  summarise(general_racism = mean(B2A, na.rm = TRUE)) 
+
+youth_survey <- youth_survey %>% 
+  mutate(LS15 = scale(LS15)) %>% 
+  mutate(B10A = scale(B10A)) %>% 
+  mutate(B2A = scale(B2A)) %>% 
+  mutate(perceived_diff = LS15 + B10A + B2A)  
+
+difference_scale <- youth_survey %>%
+  group_by(school_zone) %>%
+  summarise(difference_scale = mean(perceived_diff, na.rm = TRUE))
+
+difference_scale <- get_along_diffppl %>% 
+  right_join(get_along_diffpplR, by = "school_zone") %>%
+  right_join(personal_racism, by = "school_zone") %>% 
+  right_join(general_racism, by = "school_zone") %>% 
+  right_join(difference_scale, by = "school_zone")
+rm(get_along_diffppl, personal_racism, general_racism, get_along_diffpplR)
+
+# aggregating across composites 
+mapping_dataset <- shp_files %>% 
+  rename(school_zone = SCHOOL_NAM) %>% 
+  right_join(total_involvement, by = "school_zone") %>% 
+  right_join(social_support, by = "school_zone") %>% 
+  right_join(stress_safety, by = "school_zone") %>% 
+  right_join(difference_scale, by = "school_zone")
+
+
+```
+
+```{r exploratory factor analysis}
+
+# FACTOR ANALYSIS FOR SOCIAL SUPPORT 
+
+social_support_subset <- youth_survey %>% 
+  #select(PC1,PC2,PF4,PF9,PS3,PS5,PS7,PS8) %>% # all of these together did not work 
+  select(PC2,PS3,PS7,PS8)
+
+cormat <- cor(social_support_subset, use = "na.or.complete")
+
+fact1 <- fa(r = cormat, nfactors = 1, rotate = "oblimin", fm = "ml")
+fact1
+print(fact1$loadings, cutoff = 0.5)
+fa.diagram(fact1, cut = 0.5)
+
+psych::alpha(social_support_subset) # alpha = 0.69
+
+fact2 <- fa(r = cormat, nfactors = 1, rotate = "varimax", fm = "pa")
+fact2
+print(fact2$loadings, cutoff = 0.5)
+fa.diagram(fact2, cut = 0.5)
+
+psych::alpha(social_support_subset) # alpha = 0.7
+
+# FACTOR ANALYSIS FOR STRESS AND STABILITY 
+
+stress_subset <- youth_survey %>% 
+  #select(H20,PS6,RC19,RC17) 
+  select(PS6,RC19) 
+
+cormat <- cor(stress_subset, use = "na.or.complete")
+
+fact1 <- fa(r = cormat, nfactors = 1, rotate = "oblimin", fm = "ml")
+fact1
+print(fact1$loadings, cutoff = 0.5)
+fa.diagram(fact1, cut = 0.5)
+
+psych::alpha(stress_subset) # alpha = 0.7
+
+# MAYBE THEY CAN WORK TOGETHER? 
+
+combined_subset <- youth_survey %>% 
+  select(PS6,RC19,PC2,PS3,PS7,PS8) 
+
+cormat <- cor(combined_subset, use = "na.or.complete")
+
+fact1 <- fa(r = cormat, nfactors = 1, rotate = "oblimin", fm = "ml")
+fact1
+print(fact1$loadings, cutoff = 0.5)
+fa.diagram(fact1, cut = 0.5)
+
+psych::alpha(stress_subset) # alpha = 0.2 so NOPE 
+
+#############
+
+ys_all_qtd <- youth_survey_copy %>% select(-school_zone) 
+
+ys_all_qtd <- youth_survey_copy %>% select(PC1,PC11,PC2,PF4,PF9,PS3,PS5,PS6,PS7,PS8)
+
+youth_std <- data.frame(scale(ys_all_qtd, center = TRUE, scale = TRUE))
+describe(youth_std)
+
+cormat <- cor(youth_std, use = "na.or.complete")
+
+fact1 <- fa(r = cormat, nfactors = 1, rotate = "oblimin", fm = "ml")
+fact1
+print(fact1$loadings, cutoff = 0.5)
+fa.diagram(fact1, cut = 0.5)
+
+psych::alpha(youth_std)
+
+```
+
+```{r SOCIAL INVOLVEMENT, fig.width=9.5}
+
+# SOCIAL INVOLVEMENT (school_involvement, team_involvement, volunteer_involvement, religious_involvement, total_involvement)
+
+a <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=school_involvement)) + 
+  labs(title = "School Involvement", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.9)) 
+                        
+b <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=team_involvement)) + 
+  labs(title = "Team or Club Involvement", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.9))
+
+c <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=volunteer_involvement)) + 
+  labs(title = "Volunteer Involvement", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5))  + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.9))
+
+d <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=religious_involvement)) + 
+  labs(title = "Religious Involvement", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.9))
+
+e <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=total_involvement)) + 
+  labs(title = "Overall Social Involvement", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.9))
+
+grid.arrange(a,b,e,c,d, ncol=3, nrow=2, top=textGrob("Social and Civic Involvement", gp=gpar(fontsize=20)))
+
+```
+
+```{r SOCIAL SUPPORT, fig.width=9.5}
+
+# SOCIAL SUPPORT
+# neighbors_notice, neighbor_support, parents_involve_me, parents_support, teachers_notice, teachers_available, teacher_parent_comm, teacher_praise, total_support
+
+describe(social_support)
+
+nbr1 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=neighbors_notice)) + 
+  labs(title = "Neighbors Notice Me", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+  #scale_fill_continuous(limits = c(1,5), breaks = c(1,5))
+                        
+nbr2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=neighbor_support)) + 
+  labs(title = "Neighborhood Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+pnt1 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=parents_involve_me)) + 
+  labs(title = "Parents Involve Me", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5))  + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+pnt2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=parents_support)) + 
+  labs(title = "Parent Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+teach1 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_notice)) + 
+  labs(title = "Teachers Notice Me", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+teach3 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_available)) + 
+  labs(title = "Teacher Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+teach2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teacher_praise)) + 
+  labs(title = "Teacher Praise", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+teach4 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teacher_parent_comm)) + 
+  labs(title = "Parent-Teacher Communication", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.2,0.8))
+
+totalspt <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=total_support)) + 
+  labs(title = "Support Factor", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.4,0.5))
+describe(total_support)
+totalspt
+
+grid.arrange(nbr1,nbr2,totalspt,
+             pnt1,pnt2,
+             ncol=3, nrow=2, top=textGrob("Social Support Outcomes", gp=gpar(fontsize=20)))
+
+grid.arrange(teach1,teach2, totalspt, 
+             teach3,teach4,
+             ncol=3, nrow=2, top=textGrob("Social Support Outcomes", gp=gpar(fontsize=20)))
+
+```
+
+```{r parent-teacher relations, fig.width=9.5}
+                        
+teach3 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_available), size=0.001, show.legend = FALSE) + 
+  labs(title = "Teacher Support", 
+       caption = "Source: Fairfax County Youth Survey (2017)") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank(),
+        plot.title = element_text(size = 16, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.1, 0.1)) + scale_fill_viridis_c("Involvement", limits=c(0.6,0.8))
+#ggsave("./docs/lodes/chg_female.png")
+
+
+pnt2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=parents_support), size=0.001) +  
+  labs(title = "Parent Support", 
+       caption = "Source: Fairfax County Youth Survey (2017)") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank(),
+        plot.title = element_text(size = 16, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.1, 0.15)) + scale_fill_viridis_c("Involvement", limits=c(0.6,0.8))
+
+parent_teacher <- grid.arrange(pnt2, teach3, ncol=2, nrow=1, 
+             top=textGrob("", gp=gpar(fontsize=16)))
+ggsave("./docs/ffx-youth/test.png")
+
+total <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=total_support), size=0.001) +  
+  labs(title = "Overall Social Support", 
+       caption = "Source: Fairfax County Youth Survey (2017)") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank(),
+        plot.title = element_text(size = 16, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.1, 0.1)) + scale_fill_viridis_c("Involvement", limits=c(0.4,0.61))
+total
+```
+
+```{r parent-teacher relations again, fig.width=9.5}
+                        
+teach3 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_available)) + 
+  labs(title = "Teacher Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.6,0.8))
+
+pnt2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=parents_support)) + 
+  labs(title = "Parent Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.6,0.8))
+
+teach4 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teacher_parent_comm)) + 
+  labs(title = "Parent-Teacher Communication", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.3,0.5))
+
+grid.arrange(pnt2, teach3, teach4, ncol=3, nrow=1, 
+             top=textGrob("Social Support", gp=gpar(fontsize=20)))
+
+```
+
+```{r parent-teacher version 3, fig.width=9.5}
+                        
+teach1 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_notice)) + 
+  labs(title = "Teachers Notice Me", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.3,0.75))
+
+teach3 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teachers_available)) + 
+  labs(title = "Teacher Support", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.3,0.75))
+
+teach2 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teacher_praise)) + 
+  labs(title = "Teacher Praise", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.3,0.75))
+
+teach4 <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=teacher_parent_comm)) + 
+  labs(title = "Parent-Teacher Communication", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) + scale_fill_viridis_c("Involvement", limits=c(0.3,0.75))
+
+grid.arrange(teach1, teach2, teach3, teach4, ncol=2, nrow=2, 
+             top=textGrob("Social Support", gp=gpar(fontsize=20)))
+
+```
+
+
+```{r STRESS AND STABILITY, fig.width=9.5}
+
+# STRESS AND STABILITY = stress, sleep, school_safety, nhood_safety, times_moved, total_stress 
+
+a <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=stress)) + 
+  labs(title = "Reported Stress Levels", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) 
+  #scale_fill_continuous(limits = c(1,5), breaks = c(1,5))
+                        
+b <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=sleep)) + 
+  labs(title = "Hours of Sleep", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+c <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=school_safety)) + 
+  labs(title = "School Danger Levels", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5))  + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+d <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=nhood_safety)) + 
+  labs(title = "Neighborhood Danger Levels", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+e <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=times_moved)) + 
+  labs(title = "Times Moved Since Kindergarten", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+f <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=total_stress)) + 
+  labs(title = "Cumulative Stressors", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+grid.arrange(a,b,c,d,e,f, ncol=3, nrow=2, top=textGrob("Stress Outcomes", gp=gpar(fontsize=20)))
+
+```
+
+```{r Perceived Difference Scores, fig.width=9.5}
+
+# get_along_diffppl, personal_racism, general_racism, difference_scale
+
+a <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=get_along_diffpplR)) + 
+  labs(title = "Gets Along with 'Different' People", fill = "Outcome") +
+  #theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank()) 
+  #scale_fill_continuous(limits = c(1,5), breaks = c(1,5))
+                        
+b <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=personal_racism)) + 
+  labs(title = "Experienes of Personal Racism", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+c <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=general_racism)) + 
+  labs(title = "Experiences of General Racism", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5))  + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+d <- ggplot(mapping_dataset) + 
+  geom_sf(aes(fill=difference_scale)) + 
+  labs(title = "Least Culturally Accepting Areas", fill = "Outcome") +
+  theme_update(plot.title = element_text(hjust = 0.5)) + 
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        rect = element_blank())
+
+grid.arrange(a,b,c,d, ncol=2, nrow=2, top=textGrob("Perceived Difference Scores", gp=gpar(fontsize=20)))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
