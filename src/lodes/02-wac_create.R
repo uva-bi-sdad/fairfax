@@ -39,6 +39,17 @@ library(tidyselect)
 # CS01 Num Number of jobs for workers with Sex: Male
 # CS02 Num Number of jobs for workers with Sex: Female
 
+# CFA01 Num Number of jobs for workers at firms with Firm Age: 0-1 Years
+# CFA02 Num Number of jobs for workers at firms with Firm Age: 2-3 Years
+# CFA03 Num Number of jobs for workers at firms with Firm Age: 4-5 Years
+# CFA04 Num Number of jobs for workers at firms with Firm Age: 6-10 Years
+# CFA05 Num Number of jobs for workers at firms with Firm Age: 11+ Years
+# CFS01 Num Number of jobs for workers at firms with Firm Size: 0-19 Employees
+# CFS02 Num Number of jobs for workers at firms with Firm Size: 20-49 Employees
+# CFS03 Num Number of jobs for workers at firms with Firm Size: 50-249 Employees
+# CFS04 Num Number of jobs for workers at firms with Firm Size: 250-499 Employees
+# CFS05 Num Number of jobs for workers at firms with Firm Size: 500+ Employees
+
 
 #
 # Filter to Fairfax county ---------------------------------------------------------

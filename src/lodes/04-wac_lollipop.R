@@ -131,11 +131,6 @@ ggplot(ctydata) +
   scale_color_manual(name = "Year", 
                      labels = c(2009, 2017),
                      values = c(rgb(0.2, 0.7, 0.1, 0.5), rgb(0.7, 0.2, 0.1, 0.5)))
-
-
-
-                     
-                     
                      
 # Save
-ggsave("./doc/discrepancies/counties_all_discr_imp_compare_lol.png", plot = last_plot(), device = "png")
+ggsave("./docs/lodes/lollipop.png", plot = last_plot(), device = "png")
