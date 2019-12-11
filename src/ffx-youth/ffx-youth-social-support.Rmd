@@ -60,10 +60,14 @@ normalize <- function(x) {
 
 ys_all_qtd <- youth_survey_copy %>% 
   select(PC1,PC11,PC2,PF4,PF9,PS3,PS5,PS6,PS7,PS8,school_zone) %>% 
-  mutate(PC1 = scale(PC1)) %>% mutate(PC11 = scale(PC11)) %>% mutate(PC2 = scale(PC2)) %>% mutate(PF4 = scale(PF4)) %>% mutate(PF9 = scale(PF9)) %>% 
-  mutate(PS3 = scale(PS3)) %>% mutate(PS5 = scale(PS5)) %>% mutate(PS6 = scale(PS6)) %>%   mutate(PS7 = scale(PS7)) %>% mutate(PS8 = scale(PS8)) %>%
-  mutate(PC1 = normalize(PC1)) %>% mutate(PC11 = normalize(PC11)) %>% mutate(PC2 = normalize(PC2)) %>% mutate(PF4 = normalize(PF4)) %>% mutate(PF9 = normalize(PF9)) %>% 
-  mutate(PS3 = normalize(PS3)) %>% mutate(PS5 = normalize(PS5)) %>% mutate(PS6 = normalize(PS6)) %>%   mutate(PS7 = normalize(PS7)) %>% mutate(PS8 = normalize(PS8)) %>%
+  mutate(PC1 = scale(PC1)) %>% mutate(PC11 = scale(PC11)) %>% 
+  mutate(PC2 = scale(PC2)) %>% mutate(PF4 = scale(PF4)) %>% mutate(PF9 = scale(PF9)) %>% 
+  mutate(PS3 = scale(PS3)) %>% mutate(PS5 = scale(PS5)) %>% mutate(PS6 = scale(PS6)) %>%   
+  mutate(PS7 = scale(PS7)) %>% mutate(PS8 = scale(PS8)) %>%
+  mutate(PC1 = normalize(PC1)) %>% mutate(PC11 = normalize(PC11)) %>% 
+  mutate(PC2 = normalize(PC2)) %>% mutate(PF4 = normalize(PF4)) %>% mutate(PF9 = normalize(PF9)) %>% 
+  mutate(PS3 = normalize(PS3)) %>% mutate(PS5 = normalize(PS5)) %>% mutate(PS6 = normalize(PS6)) %>%   
+  mutate(PS7 = normalize(PS7)) %>% mutate(PS8 = normalize(PS8)) %>%
   group_by(school_zone) %>%
   mutate(support_sum = PC1+PC11+PC2+PF4+PF9+PS3+PS5+PS6+PS7+PS8) %>%
   summarise(total_support = mean(support_sum, na.rm = TRUE)) %>% 
