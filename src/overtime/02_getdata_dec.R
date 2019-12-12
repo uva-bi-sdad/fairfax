@@ -9,8 +9,8 @@
 # Find variables (note: this takes forever): 2000 -------------------------------------------------------------------------
 #
  
-allvars_long <- load_variables(year = 2000, dataset = "sf3", cache = TRUE)
-View(allvars_long)
+# allvars_long <- load_variables(year = 2000, dataset = "sf3", cache = TRUE)
+# View(allvars_long)
 
 # Black
 # Total pop: P006001
@@ -74,8 +74,8 @@ dec2000 <- dec2000 %>% mutate(
 
 # Note: all tables are named "population subjects" and I have no idea what the denominators are....
 
-allvars_long90 <- load_variables(year = 1990, dataset = "sf3", cache = TRUE)
-View(allvars_long90)
+# allvars_long90 <- load_variables(year = 1990, dataset = "sf3", cache = TRUE)
+# View(allvars_long90)
 
 # Persons total: P0010001
 # Families total: P0040001
@@ -114,7 +114,7 @@ dec1990 <- get_decennial(geography = "tract", year = 1990, state = 51, county = 
 # Clean
 dec1990 <- dec1990 %>% mutate(
   lesshs = (P0570001 + P0570002) / P0010001,
-  hispanic = (P0120006 + P0120007 + P0120008 + P0120009 + P0120010) / P0100001,
+  hispanic = (P0120006 + P0120007 + P0120008 + P0120009 + P0120010) / P0010001,
   black = P0080002 / P0010001,
   inpoverty = (P1200008 + P1200009 + P1200010 + P1200011 + P1200012 + P1200013 + P1200014) / P0050001,
   singleparent = (P0190003 + P0190005) / P0050001)
@@ -124,7 +124,7 @@ dec1990 <- dec1990 %>% mutate(
 #
 
 # Lookup
-search_tablecontents(survey = "dec", years = 2000)
+# search_tablecontents(survey = "dec", years = 2000)
 
 # Then you can look up labels with
-acs.lookup(endyear = 1990, dataset = "sf3", keyword = "EDUCATION")
+# acs.lookup(endyear = 1990, dataset = "sf3", keyword = "EDUCATION")
