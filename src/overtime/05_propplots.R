@@ -2,7 +2,7 @@ library(ggthemes)
 library(ggplot)
 library(purrr)
 library(dplyr)
-
+library(magick)
 
 #
 # Prepare data and names ---------------------------------------------------------------------------------------------------------------------
@@ -50,6 +50,13 @@ plotnames_hisp
 
 walk2(plotnames_hisp, plots_hisp, ~ggsave(path = "./docs/varplots/", device = "png", filename = .x, plot = .y, height = 7, width = 7))
 
+# Animate
+list.files(path = "./docs/varplots/", pattern = "hisp_", full.names = T) %>% 
+  map(image_read) %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("./docs/varplots/animation_hisp.gif")
+
 
 #
 # Plot proportion Black ---------------------------------------------------------------------------------------------------------------------
@@ -84,6 +91,13 @@ plotnames_black <- paste0("black_", yrnames, ".png")
 plotnames_black
 
 walk2(plotnames_black, plots_black, ~ggsave(path = "./docs/varplots/", device = "png", filename = .x, plot = .y, height = 7, width = 7))
+
+# Animate
+list.files(path = "./docs/varplots/", pattern = "black_", full.names = T) %>% 
+  map(image_read) %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("./docs/varplots/animation_black.gif")
 
 
 #
@@ -120,6 +134,13 @@ plotnames_inpov
 
 walk2(plotnames_inpov, plots_inpov, ~ggsave(path = "./docs/varplots/", device = "png", filename = .x, plot = .y, height = 7, width = 7))
 
+# Animate
+list.files(path = "./docs/varplots/", pattern = "inpov_", full.names = T) %>% 
+  map(image_read) %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("./docs/varplots/animation_inpov.gif")
+
 
 #
 # Plot proportion less than high school ---------------------------------------------------------------------------------------------------------------------
@@ -155,6 +176,13 @@ plotnames_lesshs
 
 walk2(plotnames_lesshs, plots_lesshs, ~ggsave(path = "./docs/varplots/", device = "png", filename = .x, plot = .y, height = 7, width = 7))
 
+# Animate
+list.files(path = "./docs/varplots/", pattern = "lesshs_", full.names = T) %>% 
+  map(image_read) %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("./docs/varplots/animation_lesshs.gif")
+
 
 #
 # Plot proportion single parent ---------------------------------------------------------------------------------------------------------------------
@@ -189,3 +217,10 @@ plotnames_single <- paste0("singleparent_", yrnames, ".png")
 plotnames_single
 
 walk2(plotnames_single, plots_single, ~ggsave(path = "./docs/varplots/", device = "png", filename = .x, plot = .y, height = 7, width = 7))
+
+# Animate
+list.files(path = "./docs/varplots/", pattern = "singleparent_", full.names = T) %>% 
+  map(image_read) %>%
+  image_join() %>%
+  image_animate(fps = 0.5) %>%
+  image_write("./docs/varplots/animation_singleparent.gif")
