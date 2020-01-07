@@ -90,6 +90,12 @@ fairfax <- fairfax %>% transmute(
 
 # Calculate proportions
 fairfax <- fairfax %>% transmute(
+  # Totals
+  total1970 = total1970,
+  total1980 = total1980,
+  total1990 = total1990,
+  total2000 = total2000,
+  total2010 = total2010,
   # Black
   propblack1970 = black1970 / total1970,
   propblack1980 = black1980 / total1980,
@@ -130,6 +136,7 @@ fairfax <- fairfax %>% transmute(
 
 # Add 2015 data
 vars1317 <- c(
+  "B01003_001", # total population
   "B15003_001", "B15003_002", "B15003_003", "B15003_004", "B15003_005", 
   "B15003_006", "B15003_007", "B15003_008", "B15003_009", "B15003_010",
   "B15003_011", "B15003_012",                                          # less than HS/up to and including grade 9: (002 to 012)/001
@@ -143,6 +150,7 @@ acs1317 <- get_acs(geography = "county", state = 51, county = 059, variables = v
                    output = "wide", geometry = FALSE, keep_geo_vars = FALSE)
 
 acs1317 <- acs1317 %>% transmute(
+  total2015 = B01003_001E,
   proplesshs2015 = (B15003_002E + B15003_003E +  B15003_004E + B15003_005E + B15003_006E + B15003_007E + B15003_008E + B15003_009E +
               B15003_010E + B15003_011E + B15003_012E) / B15003_001E,
   prophisp2015 = B03003_003E / B03003_001E,
@@ -158,21 +166,31 @@ acs1317 <- as.data.frame(acs1317)
 fairfax <- base::cbind(fairfax, acs1317)
 
 # Pivot
-fairfax_lng <- fairfax %>% pivot_longer(cols = 1:36, values_to = "prop")
+fairfax_lng <- fairfax %>% pivot_longer(cols = 1:42, values_to = "prop")
 fairfax_lng <- fairfax_lng %>% arrange(name)
 fairfax_lng <- fairfax_lng %>% mutate(year = str_extract_all(name, "[0-9]{4}", simplify = TRUE),
                                       name = str_extract_all(name, "[a-zA-Z]+", simplify = TRUE))
 fairfax_lng$name <- as.factor(fairfax_lng$name)
-fairfax_lng$name <- factor(fairfax_lng$name, levels = c("propunemp", "proplesshs", "propinpov", "propsingle", "propblack", "prophisp"),
+fairfax_lng$name <- factor(fairfax_lng$name, levels = c("propunemp", "proplesshs", "propinpov", "propsingle", "propblack", "prophisp", "total"),
                            labels = c("Proportion unemployed", "Proportion <HS education", "Proportion in poverty", "Proportion single-parent families", "Proportion Black",
-                                      "Proportion Hispanic"))
+                                      "Proportion Hispanic", "Total population"))
 
 # Plot
-ggplot(fairfax_lng, aes(y = prop, x = year)) +
+ggplot(fairfax_lng[fairfax_lng$name != "Total population", ], aes(y = prop, x = year)) +
   geom_bar(stat = "identity") +
   facet_wrap(~name) +
   theme_ipsum_tw() +
   labs(title = "Fairfax County Select Population Characteristics, 1970-2015", x = "Year", y = "Proportion",
        caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
+
+# Plot population growth
+ggplot(fairfax_lng[fairfax_lng$name == "Total population", ], aes(y = prop, x = year, group = name)) +
+  geom_point() +
+  geom_line() + 
+  theme_ipsum_tw() +
+  scale_y_continuous(breaks = seq(0, 1200000, 200000), limits = c(300000, 1200000)) +
+  labs(title = "Fairfax County Total Population, 1970-2015", x = "Year", y = "Total population (count)",
+       caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
+
 
 
