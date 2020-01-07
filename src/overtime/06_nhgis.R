@@ -11,6 +11,7 @@ library(tidyr)
 library(stringr)
 library(ggplot2)
 library(hrbrthemes)
+library(scales)
 
 census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
@@ -184,11 +185,11 @@ ggplot(fairfax_lng[fairfax_lng$name != "Total population", ], aes(y = prop, x = 
        caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
 
 # Plot population growth
-ggplot(fairfax_lng[fairfax_lng$name == "Total population", ], aes(y = prop, x = year, group = name)) +
-  geom_point() +
-  geom_line() + 
+ggplot(fairfax_lng[fairfax_lng$name == "Total population", ], aes(y = prop, x = year, group = name, label = prop)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = comma(prop)), size = 5, vjust = -0.5) +
   theme_ipsum_tw() +
-  scale_y_continuous(breaks = seq(0, 1200000, 200000), limits = c(300000, 1200000)) +
+  scale_y_continuous(breaks = seq(0, 1200000, 200000), limits = c(0, 1200000), labels = comma) +
   labs(title = "Fairfax County Total Population, 1970-2015", x = "Year", y = "Total population (count)",
        caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
 
