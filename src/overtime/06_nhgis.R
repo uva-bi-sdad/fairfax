@@ -12,6 +12,7 @@ library(stringr)
 library(ggplot2)
 library(hrbrthemes)
 library(scales)
+library(forcats)
 
 census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
@@ -24,14 +25,6 @@ fairfax <- data %>% filter(COUNTY == "Fairfax County")
 
 # Make variables easier to work with
 fairfax <- fairfax %>% transmute(
-  # Identifiers
-  gisjoin = GISJOIN, 
-  state = STATE, 
-  statefp = STATEFP, 
-  statenh = STATENH, 
-  county = COUNTY, 
-  countyfp = COUNTYFP, 
-  countynh = COUNTYNH,
   # Total persons
   total1970 = AV0AA1970,
   total1980 = AV0AA1980,
@@ -63,6 +56,12 @@ fairfax <- fairfax %>% transmute(
   unemp1990 = B84AE1990,
   unemp2000 = B84AE2000,
   unemp200812 = B84AE125, # unempl 2010 = 5 year 2008-12
+  # Civilian labor force
+  civlabor1970 = B84AC1970,
+  civlabor1980 = B84AC1980,
+  civlabor1990 = B84AC1990,
+  civlabor2000 = B84AC2000,
+  civlabor200812 = B84AC125, # unempl 2010 = 5 year 2008-12
   # Single parent family
   single1970 = AG4AE1970 + AG4AI1970,
   single1980 = AG4AE1980 + AG4AI1980,
@@ -116,11 +115,11 @@ fairfax <- fairfax %>% transmute(
   proplesshs2000 = lesshs2000 / total2000,
   proplesshs2010 = lesshs200812 / total200812, # less than HS 2010 = 5 year 2008-12
   # Unemployed
-  propunemp1970 = unemp1970 / total1970,
-  propunemp1980 = unemp1980 / total1980,
-  propunemp1990 = unemp1990 / total1990,
-  propunemp2000 = unemp2000 / total2000,
-  propunemp2010 = unemp200812 / total200812, # unemp 2010 = 5 year 2008-12
+  propunemp1970 = unemp1970 / civlabor1970,
+  propunemp1980 = unemp1980 / civlabor1980,
+  propunemp1990 = unemp1990 / civlabor1990,
+  propunemp2000 = unemp2000 / civlabor2000,
+  propunemp2010 = unemp200812 / civlabor200812, # unemp 2010 = 5 year 2008-12
   # Single parent
   propsingle1970 = single1970 / singleden1970, 
   propsingle1980 = single1980 / singleden1980, 
@@ -145,7 +144,7 @@ vars1317 <- c(
   "B02001_001", "B02001_003",                                           # black: 003/001
   "B17020_001", "B17020_002",                                           # in poverty: 002/001
   "B11003_001",  "B11003_010", "B11003_016",                          # single parent: (010+016)/001
-  "B23025_001", "B23025_005")                                          # in labor force but unemployed: 005/001
+  "B23025_003", "B23025_005")                                          # in civilian labor force but unemployed: 005/001
 
 acs1317 <- get_acs(geography = "county", state = 51, county = 059, variables = vars1317, year = 2017, survey = "acs5", cache_table = TRUE, 
                    output = "wide", geometry = FALSE, keep_geo_vars = FALSE)
@@ -158,7 +157,7 @@ acs1317 <- acs1317 %>% transmute(
   propblack2015 = B02001_003E / B02001_001E,
   propinpov2015 = B17020_002E / B17020_001E,
   propsingle2015 = (B11003_010E + B11003_016E) / B11003_001E,
-  propunemp2015 = B23025_005E / B23025_001E)
+  propunemp2015 = B23025_005E / B23025_003E)
 # acs1317 <- acs1317 %>% st_set_geometry(NULL)
 
 # Join

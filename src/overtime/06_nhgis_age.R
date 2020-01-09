@@ -98,4 +98,13 @@ ggplot(fairfax_lng, aes(y = prop, x = year)) +
   labs(title = "Fairfax County Age Distribution, 1970-2015", x = "Year", y = "Proportion",
        caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
 
+# Plot alternative
+ggplot(fairfax_lng[fairfax_lng$name != "Total population", ], aes(fill = fct_reorder(name, desc(name)), y = prop, x = year)) + 
+  geom_bar(position = "fill", stat = "identity") +
+  geom_text(aes(label = round(prop, 2)), size = 3, position = position_stack(vjust = 0.5)) +
+  theme_ipsum_tw() +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_d(option = "cividis", begin = 0.5, end = 0.8) +
+  labs(title = "Fairfax County Age Distribution, 1970-2015", x = "Year", y = "Proportion", fill = "Age Group",
+       caption = "Source: 1970-2010 University of Minnesota National Historical GIS; 2013-2017 American Community Survey.\nData are nominally harmonized. County border changes across time may introduce small error in estimates.")
 
