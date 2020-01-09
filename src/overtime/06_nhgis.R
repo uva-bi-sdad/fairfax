@@ -144,7 +144,7 @@ vars1317 <- c(
   "B02001_001", "B02001_003",                                           # black: 003/001
   "B17020_001", "B17020_002",                                           # in poverty: 002/001
   "B11003_001",  "B11003_010", "B11003_016",                          # single parent: (010+016)/001
-  "B23025_003", "B23025_005")                                          # in civilian labor force but unemployed: 005/001
+  "B23025_003", "B23025_005")                                          # in civilian labor force but unemployed: 005/003
 
 acs1317 <- get_acs(geography = "county", state = 51, county = 059, variables = vars1317, year = 2017, survey = "acs5", cache_table = TRUE, 
                    output = "wide", geometry = FALSE, keep_geo_vars = FALSE)
