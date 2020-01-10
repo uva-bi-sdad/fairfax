@@ -1179,7 +1179,7 @@ ggplot(neighborhoods_lng[neighborhoods_lng$name != "Total population", ], aes(y 
   theme_pander() +
   facet_wrap(~name, scales = "free_y") +
   scale_colour_manual(values = c("#ff0000", "#a6611a", "#dfc27d", "#a9a9a9", "#80cdc1", "#018571")) + 
-  scale_y_continuous(labels = number_format(accuracy = 0.01)) +
+  scale_y_continuous(labels = number_format(accuracy = 0.02)) +
   labs(title = "Opportunity Neighborhood Select Population Characteristics, 2010-2015", x = "Year", y = "Proportion",
        caption = "Source: American Community Survey.", color = "Opportunity\nNeighborhood")
 
