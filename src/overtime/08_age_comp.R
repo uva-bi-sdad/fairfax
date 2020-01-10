@@ -16,6 +16,11 @@ library(forcats)
 
 census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
+
+#
+# Fairfax, Virginia, USA ----------------------------------------------------------------------------
+#
+
 # Vars
 vars1317 <- c(
   "B01001_001", # total for age
@@ -89,3 +94,100 @@ ggplot(data_lng, aes(fill = fct_reorder(name, desc(name)), y = prop, x = place))
        caption = "Source: 2013-2017 American Community Survey.")
 
 
+#
+# Similar counties ----------------------------------------------------------------------------
+#
+
+# Countries ranked 30-50 by population size in the US. Fairfax is ranked 38th. 
+# Selecting counties closest in population density for comparison.
+
+similar <- read_csv("./data/working/counties_like_fairfax.csv", col_names = TRUE) %>%
+  mutate(density = census_est2018 / landarea_misq) %>%
+  arrange(desc(density))
+head(similar, 10)
+
+# Get data
+fairfaxva <- get_acs(geography = "county", state = 51, county = 059, variables = vars1317, year = 2017, 
+                     survey = "acs5", cache_table = TRUE, 
+                     output = "wide", geometry = FALSE, keep_geo_vars = FALSE) %>%
+             mutate(loc = "Fairfax, VA")
+pinellasfl <- get_acs(geography = "county", state = 12, county = 103, variables = vars1317, year = 2017, 
+                      survey = "acs5", cache_table = TRUE, 
+                      output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+             mutate(loc = "Pinellas, FL")
+cuyahogaoh <- get_acs(geography = "county", state = 39, county = 035, variables = vars1317, year = 2017, 
+                      survey = "acs5", cache_table = TRUE, 
+                      output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+            mutate(loc = "Cuyahoaga, OH")
+franklinoh <- get_acs(geography = "county", state = 39, county = 049, variables = vars1317, year = 2017, 
+                      survey = "acs5", cache_table = TRUE, 
+                      output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+           mutate(loc = "Franklin, OH")
+hennepinmn <- get_acs(geography = "county", state = 27, county = 053, variables = vars1317, year = 2017, 
+                      survey = "acs5", cache_table = TRUE, 
+                      output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+              mutate(loc = "Hennepin, MN")
+westchesterny <- get_acs(geography = "county", state = 36, county = 119, variables = vars1317, year = 2017, 
+                         survey = "acs5", cache_table = TRUE, 
+                      output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+              mutate(loc = "Westchester, NY")
+montgomerymd <- get_acs(geography = "county", state = 24, county = 031, variables = vars1317, year = 2017, 
+                        survey = "acs5", cache_table = TRUE, 
+                         output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+             mutate(loc = "Montgomery, MD")
+mecklenburgnc <- get_acs(geography = "county", state = 37, county = 119, variables = vars1317, year = 2017, 
+                         survey = "acs5", cache_table = TRUE, 
+                        output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+             mutate(loc = "Mecklenburg, NC")
+fultonga <- get_acs(geography = "county", state = 13, county = 121, variables = vars1317, year = 2017, 
+                    survey = "acs5", cache_table = TRUE, 
+                         output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+             mutate(loc = "Fulton, GA")
+stlouismo <- get_acs(geography = "county", state = 29, county = 189, variables = vars1317, year = 2017, 
+                     survey = "acs5", cache_table = TRUE, 
+                    output = "wide", geometry = FALSE, keep_geo_vars = FALSE)  %>%
+             mutate(loc = "St. Louis, MO")
+
+# Join
+data <- rbind(fairfaxva, pinellasfl, cuyahogaoh, franklinoh, hennepinmn, 
+              westchesterny, montgomerymd, mecklenburgnc, fultonga, stlouismo)
+
+# Calculate
+data <- data %>% transmute(
+  ctyname = loc,
+  propyoung = (B01001_003E + B01001_004E + B01001_005E + B01001_006E + B01001_007E + B01001_008E + B01001_009E + B01001_010E +
+                     B01001_027E + B01001_028E + B01001_029E + B01001_030E + B01001_031E + B01001_032E + B01001_033E + B01001_034E) / B01001_001E,
+  propold = (B01001_020E + B01001_021E + B01001_022E + B01001_023E + B01001_024E + B01001_025E + B01001_044E + B01001_045E + B01001_046E + B01001_047E + B01001_048E + B01001_049E) / B01001_001E,
+  propwork = (B01001_011E + B01001_012E + B01001_013E + B01001_014E + B01001_015E + B01001_016E + B01001_017E + B01001_018E + B01001_019E +
+                    B01001_035E + B01001_036E + B01001_037E + B01001_038E + B01001_039E + B01001_040E + B01001_041E + B01001_042E + B01001_043E) / B01001_001E)
+
+# Pivot
+data_lng <- data %>% pivot_longer(cols = 2:4, values_to = "prop")
+data_lng <- data_lng %>% arrange(name)
+data_lng$name <- as.factor(data_lng$name)
+data_lng$name <- factor(data_lng$name, levels = c("propyoung", "propwork", "propold"),
+                        labels = c("Proportion age <25", "Proportion age 25-64", "Proportion age 65+"))
+data_lng$ctyname <- as.factor(data_lng$ctyname)
+data_lng$ctyname <- factor(data_lng$ctyname, levels = c("Pinellas, FL", 
+                                                        "Cuyahoaga, OH", 
+                                                        "St. Louis, MO",
+                                                        "Westchester, NY",
+                                                        "Montgomery, MD",
+                                                        "Hennepin, MN", 
+                                                        "Fairfax, VA", 
+                                                        "Franklin, OH",
+                                                        "Fulton, GA",
+                                                        "Mecklenburg, NC"))
+
+# Plot alternative
+ggplot(data_lng, aes(fill = fct_reorder(name, desc(name)), y = prop, x = ctyname)) + 
+  geom_bar(position = "fill", stat = "identity") +
+  geom_text(aes(label = round(prop, 2)), size = 3, position = position_stack(vjust = 0.5)) +
+  theme_ipsum_tw() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30, size = 10, vjust = 0.5)) +
+  scale_fill_viridis_d(option = "cividis", begin = 0.5, end = 0.8) +
+  labs(title = "Area Age Distribution Comparison", 
+       subtitle = "Showing counties closest in population size and density to Fairfax County.", 
+       x = "Area", y = "Proportion", fill = "Age Group",
+       caption = "Source: 2013-2017 American Community Survey.")
