@@ -1185,12 +1185,20 @@ ggplot(neighborhoods_lng[neighborhoods_lng$name != "Total population", ], aes(y 
 
 # Plot population
 ggplot(neighborhoods_lng[neighborhoods_lng$name == "Total population" & neighborhoods_lng$id != "Fairfax County", ], aes(y = prop, x = year, group = id, color = id)) +
-  geom_line(size = 0.8) +
+  geom_line(size = 1.8) +
   theme_pander() +
-  scale_colour_manual(values = c("#a6611a", "#dfc27d", "#a9a9a9", "#80cdc1", "#018571")) + 
-  scale_y_continuous(breaks = seq(60000, 170000, 25000), limits = c(60000, 170000), labels = comma) +
+  theme(plot.title = element_text(size = 20, face = "bold"),
+        plot.subtitle = element_text(size = 14),
+        axis.title.x = element_text(size = 14, face = "bold"), 
+        axis.title.y = element_text(size = 14, face = "bold"),
+        legend.title = element_text(size = 14, face = "bold"),
+        axis.text.x = element_text(size = 14), 
+        axis.text.y = element_text(size = 14), 
+        legend.text = element_text(size = 12)) +
+  scale_colour_manual(values = c("#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) + 
+  scale_y_continuous(breaks = seq(60000, 170000, 20000), limits = c(60000, 170000), labels = comma) +
   labs(title = "Opportunity Neighborhood Population Growth, 2010-2015", x = "Year", y = "Count",
-       caption = "Source: American Community Survey.", color = "Opportunity\nNeighborhood")
+       subtitle = "Source: American Community Survey 5-year estimates.", color = "Opportunity\nNeighborhood")
 
 
 
