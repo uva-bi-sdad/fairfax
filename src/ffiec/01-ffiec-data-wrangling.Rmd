@@ -1,0 +1,31 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "~/ffx")
+for (pkg in c("tidyverse", "data.table")) {library(pkg, character.only = TRUE)}
+```
+
+```{r}
+
+file2007 <- read_csv("hmda_2007_va_all-records_labels.csv")
+file2008 <- read_csv("hmda_2008_va_all-records_labels.csv")
+file2009 <- read_csv("hmda_2009_va_all-records_labels.csv")
+file2010 <- read_csv("hmda_2010_va_all-records_labels.csv")
+file2011 <- read_csv("hmda_2011_va_all-records_labels.csv")
+file2012 <- read_csv("hmda_2012_va_all-records_labels.csv")
+file2013 <- read_csv("hmda_2013_va_all-records_labels.csv")
+file2014 <- read_csv("hmda_2014_va_all-records_labels.csv")
+file2015 <- read_csv("hmda_2015_va_all-records_labels.csv")
+file2016 <- read_csv("hmda_2016_va_all-records_labels.csv")
+file2017 <- read_csv("hmda_2017_va_all-records_labels.csv")
+
+list_all_years <- list(file2007,file2008,file2009,file2010,file2011,file2012,file2013,file2014,file2015,file2016,file2017)
+
+all_years <- rbindlist(list_all_years)
+
+fairfax_all_years <- all_years %>% filter(county_name == "Fairfax County") 
+
+```
