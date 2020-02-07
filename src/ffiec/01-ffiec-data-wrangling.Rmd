@@ -3,29 +3,65 @@ title: "Untitled"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(root.dir = "~/ffx")
+```{r}
+#load packages
 for (pkg in c("tidyverse", "data.table")) {library(pkg, character.only = TRUE)}
+
+#setwd
+setwd("~/fairfax/rivanna_data/original/ffiec")
+
+#pull files 
+file2007 <- read.csv("hmda_2007_va_all-records_labels.csv")
+file2008 <- read.csv("hmda_2008_va_all-records_labels.csv")
+file2009 <- read.csv("hmda_2009_va_all-records_labels.csv")
+file2010 <- read.csv("hmda_2010_va_all-records_labels.csv")
+file2011 <- read.csv("hmda_2011_va_all-records_labels.csv")
+file2012 <- read.csv("hmda_2012_va_all-records_labels.csv")
+file2013 <- read.csv("hmda_2013_va_all-records_labels.csv")
+file2014 <- read.csv("hmda_2014_va_all-records_labels.csv")
+file2015 <- read.csv("hmda_2015_va_all-records_labels.csv")
+file2016 <- read.csv("hmda_2016_va_all-records_labels.csv")
+file2017 <- read.csv("hmda_2017_va_all-records_labels.csv")
+
+# convert files to a list 
+list_all_years <- list(file2007,file2008,file2009,file2010,file2011,file2012,file2013,file2014,file2015,file2016,file2017)
+
+#and bind together with data.table 
+all_years <- rbindlist(list_all_years)
+
+fairfax_all_years <- all_years %>% 
+  filter(county_name == "Fairfax County") 
+
+```
+
+```{r}
+fairfax_all_years %>% 
+  group_by(as_of_year) %>% 
+  count()
+```
+
+```{r}
+fairfax_all_years %>% 
+  group_by(census_tract_number) %>% 
+  count()
 ```
 
 ```{r}
 
-file2007 <- read_csv("hmda_2007_va_all-records_labels.csv")
-file2008 <- read_csv("hmda_2008_va_all-records_labels.csv")
-file2009 <- read_csv("hmda_2009_va_all-records_labels.csv")
-file2010 <- read_csv("hmda_2010_va_all-records_labels.csv")
-file2011 <- read_csv("hmda_2011_va_all-records_labels.csv")
-file2012 <- read_csv("hmda_2012_va_all-records_labels.csv")
-file2013 <- read_csv("hmda_2013_va_all-records_labels.csv")
-file2014 <- read_csv("hmda_2014_va_all-records_labels.csv")
-file2015 <- read_csv("hmda_2015_va_all-records_labels.csv")
-file2016 <- read_csv("hmda_2016_va_all-records_labels.csv")
-file2017 <- read_csv("hmda_2017_va_all-records_labels.csv")
-
-list_all_years <- list(file2007,file2008,file2009,file2010,file2011,file2012,file2013,file2014,file2015,file2016,file2017)
-
-all_years <- rbindlist(list_all_years)
-
-fairfax_all_years <- all_years %>% filter(county_name == "Fairfax County") 
+setwd("~/fairfax/rivanna_data/original/ffiec/hmda-va-2007-17")
+write_csv(fairfax_all_years, "hmda_2007-17_fairfax-va.csv")
 
 ```
+
+References
+
+Data available here: https://www.consumerfinance.gov/data-research/hmda/historic-data/?geo=va&records=all-records&field_descriptions=codes
+
+Other published data here: https://ffiec.cfpb.gov/data-publication/ (but not sure how that is different from what we are working with besides more variables and fewer years)
+
+
+
+
+
+
+
