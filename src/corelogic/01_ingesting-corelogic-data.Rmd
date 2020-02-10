@@ -17,9 +17,12 @@ conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad",
                   password = Sys.getenv("db_pwd"))
 
 # query the bipartite edgelist data from github data  
-corelogic <- dbGetQuery(conn, "SELECT fips_code, appr_total_value, acres, assessed_year FROM corelogic_sdad.tax_hist_1 WHERE fips_code = '01011' LIMIT 100")
+#corelogic <- dbGetQuery(conn, "SELECT fips_code, appr_total_value, acres, assessed_year FROM corelogic_sdad.tax_hist_1 WHERE fips_code = '01011' LIMIT 100")
+
+corelogic <- dbGetQuery(conn, "SELECT fips_code FROM corelogic_sdad.tax_hist_2 WHERE fips_code = '02188' LIMIT 100")
 
 # disconnect from postgresql
 dbDisconnect(conn); rm(conn)
 ```
 
+The next step is to go through each table and find which tables contain Fairfax data. Right now, it seems like that will require filtering by the fips_code or zip code. 
