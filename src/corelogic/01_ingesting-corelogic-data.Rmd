@@ -1,0 +1,25 @@
+---
+title: "Ingesting Corelogic Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(root.dir = "~/fairfax/src/corelogic")
+for (pkg in c("tidyverse", "RPostgreSQL")) {library(pkg, character.only = TRUE)}
+```
+
+```{r ingesting data}
+# connect to postgresql to get data (in rivanna)
+conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad", 
+                  host = "10.250.124.195", 
+                  port = 5432, 
+                  user = Sys.getenv("db_userid"), 
+                  password = Sys.getenv("db_pwd"))
+
+# query the bipartite edgelist data from github data  
+corelogic <- dbGetQuery(conn, "SELECT fips_code, appr_total_value, acres, assessed_year FROM corelogic_sdad.tax_hist_1 WHERE fips_code = '01011' LIMIT 100")
+
+# disconnect from postgresql
+dbDisconnect(conn); rm(conn)
+```
+

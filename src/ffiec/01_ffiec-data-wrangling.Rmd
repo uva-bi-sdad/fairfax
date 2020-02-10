@@ -49,7 +49,7 @@ fairfax_all_years %>%
 ```{r}
 
 setwd("~/fairfax/rivanna_data/original/ffiec/hmda-va-2007-17")
-write_csv(fairfax_all_years, "hmda_2007-17_fairfax-va.csv")
+write_csv(fairfax_all_years, "cfbp-hmda-ffx-2007-17.csv")
 
 ```
 
