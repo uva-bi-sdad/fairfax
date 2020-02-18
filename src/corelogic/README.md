@@ -9,5 +9,7 @@ If you look at the tables using pgAdmin, the Corelogic SDAD Data (i.e. corelogic
 * _2: "latest tax file" with some property joins (e.g. mortgage data)
 _1 and _2 are also split by state FIPS code, e.g. _1_51 is _1 data for VA (state FIPS = 51).
 
+Geocoding note:  The _2 files have lats and longs because they are joined with property information (a join/merge that corelogic did themselves and added to the data they delivered to us). However, for historical data, we only have tax data, which does not have property-level lat and long.
+
 USDA Corelogic
 While the usda_deed tables are organized by year (2005-2015), the usda_tax_history data is NOT organized by years. In other words, the numbers (i.e. usda_tax_history_01 - usda_tax_history_10) do NOT correspond to years for the tax history data. Both the tax and deed data should be relatively complete for the years 2005-2015, but there may also be some 2016-2017 data as well, but Neil has suggested that this could be incomplete.
