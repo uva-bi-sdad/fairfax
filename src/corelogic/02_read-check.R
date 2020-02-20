@@ -19,7 +19,7 @@ conn <- dbConnect(drv = PostgreSQL(), dbname = "sdad",
 
 # Get data from the 01-09 files (dump split into tables); Fairfax County, VA FIPS is 51059
 cl_ffx_01 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_01 WHERE fips_code = '51059'") # 374,831
-cl_ffx_02 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_02 WHERE fips_code = '51059'") # 0
+cl_ffx_02 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_02 WHERE fips_code = '51059'") # 374,838
 cl_ffx_03 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_03 WHERE fips_code = '51059'") # 0
 cl_ffx_04 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_04 WHERE fips_code = '51059'") # 0
 cl_ffx_05 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_05 WHERE fips_code = '51059'") # 0
@@ -47,17 +47,20 @@ cl_ffx_2 <- dbGetQuery(conn, "SELECT * FROM corelogic_sdad.tax_hist_2_51 WHERE f
 #
 
 # Check years
-table(cl_ffx_01$tax_year, useNA = "always")          # all 2017
-table(cl_ffx_01$assessed_year, useNA = "always")     # all 2017
+table(cl_ffx_01$tax_year, useNA = "always")          # 2017
+table(cl_ffx_01$assessed_year, useNA = "always")     # 2017
 
-table(cl_ffx_1$tax_year, useNA = "always")           # all 2017
-table(cl_ffx_1$assessed_year, useNA = "always")      # all 2017
+table(cl_ffx_02$tax_year, useNA = "always")          # 2016
+table(cl_ffx_02$assessed_year, useNA = "always")     # 2016
 
-table(cl_ffx_1_only$tax_year, useNA = "always")      # all 2017
-table(cl_ffx_1_only$assessed_year, useNA = "always") # all 2017
+table(cl_ffx_1$tax_year, useNA = "always")           # 2017
+table(cl_ffx_1$assessed_year, useNA = "always")      # 2017
 
-table(cl_ffx_2$tax_year, useNA = "always")           # all 2018
-table(cl_ffx_2$assessed_year, useNA = "always")      # all 2018
+table(cl_ffx_1_only$tax_year, useNA = "always")      # 2017
+table(cl_ffx_1_only$assessed_year, useNA = "always") # 2017
+
+table(cl_ffx_2$tax_year, useNA = "always")           # 2018
+table(cl_ffx_2$assessed_year, useNA = "always")      # 2018
 
 # "Latest with property" (more rows) is all 2018. The other two files (equivalent rows) are all 2017.
  
