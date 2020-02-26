@@ -25,4 +25,3 @@ corelogic <- dbGetQuery(conn, "SELECT fips_code FROM corelogic_sdad.tax_hist_2 W
 dbDisconnect(conn); rm(conn)
 ```
 
-The next step is to go through each table and find which tables contain Fairfax data. Right now, it seems like that will require filtering by the fips_code or zip code. 
