@@ -1,5 +1,6 @@
 library(RPostgreSQL)
 library(dplyr)
+library(readr)
 
 
 #
@@ -92,4 +93,18 @@ table(cl_ffx_2$assessed_year, useNA = "always")      # 2018
 dbDisconnect(conn)
 rm(conn)
 
+
+#
+# Write ---------------------------------------------------------------------------------------------
+#
+
+write_rds(cl_ffx_01, "./rivanna_data/working/corelogic/cl_ffx_01.rds")
+write_rds(cl_ffx_02, "./rivanna_data/working/corelogic/cl_ffx_02.rds")
+write_rds(cl_ffx_03, "./rivanna_data/working/corelogic/cl_ffx_03.rds")
+write_rds(cl_ffx_04, "./rivanna_data/working/corelogic/cl_ffx_04.rds")
+write_rds(cl_ffx_05, "./rivanna_data/working/corelogic/cl_ffx_05.rds")
+write_rds(cl_ffx_06, "./rivanna_data/working/corelogic/cl_ffx_06.rds")
+write_rds(cl_ffx_07, "./rivanna_data/working/corelogic/cl_ffx_07.rds")
+write_rds(cl_ffx_08, "./rivanna_data/working/corelogic/cl_ffx_08.rds")
+write_rds(cl_ffx_09, "./rivanna_data/working/corelogic/cl_ffx_09.rds")
 

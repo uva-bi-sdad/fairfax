@@ -1,10 +1,34 @@
 library(naniar)
 library(dplyr)
+library(readr)
+library(purrr)
+library(ggplot2)
+library(tibble)
 
 # Checking completeness & quality of data from the "full" tables (corelogic_sdad.tax_hist_01 through corelogic_sdad.tax_hist_0, 
 # which correspond to tax/assessed years 2017 to 2009 in descending order).
 
+# 02_read-check creates the data files.
+
 options(scipen = 999)
+
+
+#
+# Read in ----------------------------------------------------------------------
+#
+
+read_rds(cl_ffx_01, "./rivanna_data/working/corelogic/cl_ffx_01.rds")
+read_rds(cl_ffx_02, "./rivanna_data/working/corelogic/cl_ffx_02.rds")
+read_rds(cl_ffx_03, "./rivanna_data/working/corelogic/cl_ffx_03.rds")
+read_rds(cl_ffx_04, "./rivanna_data/working/corelogic/cl_ffx_04.rds")
+read_rds(cl_ffx_05, "./rivanna_data/working/corelogic/cl_ffx_05.rds")
+read_rds(cl_ffx_06, "./rivanna_data/working/corelogic/cl_ffx_06.rds")
+read_rds(cl_ffx_07, "./rivanna_data/working/corelogic/cl_ffx_07.rds")
+read_rds(cl_ffx_08, "./rivanna_data/working/corelogic/cl_ffx_08.rds")
+read_rds(cl_ffx_09, "./rivanna_data/working/corelogic/cl_ffx_09.rds")
+
+
+
 
 
 #
@@ -30,7 +54,7 @@ cl_ffx_01 %>%
          bldg_code, 
          construction_type, 
         stories_code, stories_number, number_of_units, units_number) %>%
-  gg_miss_var()
+  gg_miss_var() + labs(title = "cl_ffx_01")
 
 
 #
