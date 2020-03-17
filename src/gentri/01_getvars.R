@@ -451,7 +451,7 @@ ggplot() +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11),
         legend.position = c(0.1, 0.1)) +
-  scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Socioeconomic change")) 
+  scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Socioeconomic\nchange")) 
 
 ggplot() +
   geom_sf(data = data, size = 0.2) +
@@ -462,7 +462,7 @@ ggplot() +
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11),
         legend.position = c(0.1, 0.1)) +
-  scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Investment change")) 
+  scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Investment\nchange")) 
 
 
 plot(st_geometry(data), col = data$meets_vuln)
