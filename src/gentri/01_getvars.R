@@ -4,6 +4,8 @@ library(dplyr)
 library(sf)
 library(ggplot2)
 library(ggthemes)
+library(viridis)
+library(scales)
 
 census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
@@ -14,7 +16,7 @@ census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
 # 1) Vulnerability in the base year
 # Exhibit 3+ of the following higher than county median: 
-# B19013 for Higher percentage of low income households (80% of county median)
+# B19013 for Higher percentage of low income households (80% of county median, HUD definition)
 # B15003 for Higher percentage of 25+ without bachelor's
 # B02001 for Higher percentage non-white
 # B25003 for Higher percentage of renter households
@@ -34,6 +36,10 @@ census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 vars <- c(
   # median household income in past 12 months adjusted at end year
   "B19013_001", 
+  # household income in past 12 months
+  "B19001_001", "B19001_002", "B19001_003", "B19001_004", "B19001_005", "B19001_006", "B19001_007",
+  "B19001_008", "B19001_009", "B19001_010", "B19001_011", "B19001_012", "B19001_013", "B19001_014",
+  "B19001_015", "B19001_016", "B19001_017",
   # aged 25+ without and with BA+ (002-021 / 001 without, 022-025 / 001 with)
   "B15003_001", "B15003_002", "B15003_003", "B15003_004", "B15003_005", "B15003_006", "B15003_007", 
   "B15003_008", "B15003_009", "B15003_010", "B15003_011", "B15003_012", "B15003_013", "B15003_014", 
@@ -397,24 +403,49 @@ cty <- left_join(cty, acs0812cty)
 
 # County-level change variables
 cty <- cty %>% mutate(
+                # change for one period, 18 - 12
                 chg1218_cty_withba = cty_withba18 - cty_withba12,
                 chg1218_cty_hhinc = cty_hhinc18 - cty_hhinc12,
                 chg1218_cty_nonhispwh = cty_nonhispwh18 - cty_nonhispwh12,
                 cgh1218_cty_medrent = cty_medrent18 - cty_medrent12,
-                cgh1218_cty_medhome = cty_medhome18 - cty_medhome12)
+                cgh1218_cty_medhome = cty_medhome18 - cty_medhome12,
+                # change for two periods, 18-15, 15-12
+                chg1215_cty_withba = cty_withba15 - cty_withba12,
+                chg1215_cty_hhinc = cty_hhinc15 - cty_hhinc12,
+                chg1215_cty_nonhispwh = cty_nonhispwh15 - cty_nonhispwh12,
+                cgh1215_cty_medrent = cty_medrent15 - cty_medrent12,
+                cgh1215_cty_medhome = cty_medhome15 - cty_medhome12,
+                chg1518_cty_withba = cty_withba18 - cty_withba15,
+                chg1518_cty_hhinc = cty_hhinc18 - cty_hhinc15,
+                chg1518_cty_nonhispwh = cty_nonhispwh18 - cty_nonhispwh15,
+                cgh1518_cty_medrent = cty_medrent18 - cty_medrent15,
+                cgh1518_cty_medhome = cty_medhome18 - cty_medhome15)
 
 # Tract-level change variables
 ffx <- ffx %>% mutate(
+                 # change for one period, 18 - 12
                 chg1218_tct_withba = tct_withba18 - tct_withba12,
                 chg1218_tct_hhinc = tct_hhinc18 - tct_hhinc12,
                 chg1218_tct_nonhispwh = tct_nonhispwh18 - tct_nonhispwh12,
                 cgh1218_tct_medrent = tct_medrent18 - tct_medrent12,
-                cgh1218_tct_medhome = tct_medhome18 - tct_medhome12)
+                cgh1218_tct_medhome = tct_medhome18 - tct_medhome12,
+                # change for two periods, 18-15, 15-12
+                chg1215_tct_withba = tct_withba15 - tct_withba12,
+                chg1215_tct_hhinc = tct_hhinc15 - tct_hhinc12,
+                chg1215_tct_nonhispwh = tct_nonhispwh15 - tct_nonhispwh12,
+                cgh1215_tct_medrent = tct_medrent15 - tct_medrent12,
+                cgh1215_tct_medhome = tct_medhome15 - tct_medhome12,
+                chg1518_tct_withba = tct_withba18 - tct_withba15,
+                chg1518_tct_hhinc = tct_hhinc18 - tct_hhinc15,
+                chg1518_tct_nonhispwh = tct_nonhispwh18 - tct_nonhispwh15,
+                cgh1518_tct_medrent = tct_medrent18 - tct_medrent15,
+                cgh1518_tct_medhome = tct_medhome18 - tct_medhome15)
 
 # Individual criterions
 data <- ffx %>% transmute(GEOID = GEOID,
-                              NAME.y = NAME.y, 
-                              geometry = geometry,
+                          NAME.y = NAME.y, 
+                          geometry = geometry,
+                          # change 12-18
                               basehhinc = ifelse(tct_hhinc12 < acs0812cty$cty_hhinc12, 1, 0),
                               basenoba = ifelse(tct_noba12 > acs0812cty$cty_noba12, 1, 0),
                               basenonwhite = ifelse(tct_nonwhite12 > acs0812cty$cty_nonwhite12, 1, 0),
@@ -423,17 +454,74 @@ data <- ffx %>% transmute(GEOID = GEOID,
                               chghhinc = ifelse(chg1218_tct_hhinc > cty$chg1218_cty_hhinc, 1, 0),
                               chgnonhispwh = ifelse(chg1218_tct_nonhispwh > cty$chg1218_cty_nonhispwh, 1, 0),
                               chgmedrent = ifelse(cgh1218_tct_medrent > cty$cgh1218_cty_medrent, 1, 0),
-                              chgmedhome = ifelse(cgh1218_tct_medhome > cty$cgh1218_cty_medhome, 1, 0))
+                              chgmedhome = ifelse(cgh1218_tct_medhome > cty$cgh1218_cty_medhome, 1, 0),
+                           # change 12-15
+                              basehhinc1215 = ifelse(tct_hhinc12 < acs0812cty$cty_hhinc12, 1, 0),
+                              basenoba1215 = ifelse(tct_noba12 > acs0812cty$cty_noba12, 1, 0),
+                              basenonwhite1215 = ifelse(tct_nonwhite12 > acs0812cty$cty_nonwhite12, 1, 0),
+                              baserenters1215 = ifelse(tct_renters12 > acs0812cty$cty_renters12, 1, 0),
+                              chgba1215 = ifelse(chg1215_tct_withba > cty$chg1215_cty_withba, 1, 0),
+                              chghhinc1215 = ifelse(chg1215_tct_hhinc > cty$chg1215_cty_hhinc, 1, 0),
+                              chgnonhispwh1215 = ifelse(chg1215_tct_nonhispwh > cty$chg1215_cty_nonhispwh, 1, 0),
+                              chgmedrent1215 = ifelse(cgh1215_tct_medrent > cty$cgh1215_cty_medrent, 1, 0),
+                              chgmedhome1215 = ifelse(cgh1215_tct_medhome > cty$cgh1215_cty_medhome, 1, 0),
+                           # change 15-18
+                              basehhinc1518 = ifelse(tct_hhinc15 < acs0812cty$cty_hhinc12, 1, 0),
+                              basenoba1518 = ifelse(tct_noba15 > acs0812cty$cty_noba12, 1, 0),
+                              basenonwhite1518 = ifelse(tct_nonwhite15 > acs0812cty$cty_nonwhite12, 1, 0),
+                              baserenters1518 = ifelse(tct_renters15 > acs0812cty$cty_renters12, 1, 0),
+                              chgba1518 = ifelse(chg1518_tct_withba > cty$chg1518_cty_withba, 1, 0),
+                              chghhinc1518 = ifelse(chg1518_tct_hhinc > cty$chg1518_cty_hhinc, 1, 0),
+                              chgnonhispwh1518 = ifelse(chg1518_tct_nonhispwh > cty$chg1518_cty_nonhispwh, 1, 0),
+                              chgmedrent1518 = ifelse(cgh1518_tct_medrent > cty$cgh1518_cty_medrent, 1, 0),
+                              chgmedhome1518 = ifelse(cgh1518_tct_medhome > cty$cgh1518_cty_medhome, 1, 0))
 
 # Group criteria
-data <- data %>% mutate(meets_vuln = ifelse(basehhinc + basenoba + basenonwhite + baserenters > 2, 1, 0),
-                        meets_soc = ifelse(chgba == 1 | (chghhinc == 1 & chgnonhispwh == 1), 1, 0),
-                        meets_inv = ifelse(chgmedrent == 1 | chgmedhome == 1, 1, 0))
+data <- data %>% mutate(# one period 12-18
+                        meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwhite + baserenters > 2, 1, 0),
+                        meets_soc1218 = ifelse(chgba == 1 | (chghhinc == 1 & chgnonhispwh == 1), 1, 0),
+                        meets_inv1218 = ifelse(chgmedrent == 1 | chgmedhome == 1, 1, 0),
+                        gentrified1218 = ifelse(meets_vuln1218 == 1 & meets_soc1218 == 1 & meets_inv1218 == 1, 1, 0),
+                        type1218 = case_when(meets_vuln1218 == 0 & gentrified1218 == 0 ~ "Not vulnerable",
+                                             meets_vuln1218 == 1 & gentrified1218 == 0 ~ "Vulnerable, did not gentrify",
+                                             meets_vuln1218 == 1 & gentrified1218 == 1 ~ "Vulnerable, gentrified"),
+                        # two periods 12-15, 15-18
+                        meets_vuln1215 = ifelse(basehhinc1215 + basenoba1215 + basenonwhite1215 + baserenters1215 > 2, 1, 0),
+                        meets_soc1215 = ifelse(chgba1215 == 1 | (chghhinc1215 == 1 & chgnonhispwh1215 == 1), 1, 0),
+                        meets_inv1215 = ifelse(chgmedrent1215 == 1 | chgmedhome1215 == 1, 1, 0),
+                        gentrified1215 = ifelse(meets_vuln1215 == 1 & meets_soc1215 == 1 &  meets_inv1215 == 1, 1, 0),
+                        type1215 = case_when(meets_vuln1215 == 0 & gentrified1215 == 0 ~ "Not vulnerable",
+                                             meets_vuln1215 == 1 & gentrified1215 == 0 ~ "Vulnerable, did not gentrify",
+                                             meets_vuln1215 == 1 & gentrified1215 == 1 ~ "Vulnerable, gentrified"),
+                        meets_vuln1518 = ifelse(basehhinc1518 + basenoba1518 + basenonwhite1518 + baserenters1518 > 2, 1, 0),
+                        meets_soc1518 = ifelse(chgba1518 == 1 | (chghhinc1518 == 1 & chgnonhispwh1518 == 1), 1, 0),
+                        meets_inv1518 = ifelse(chgmedrent1518 == 1 | chgmedhome1518 == 1, 1, 0),
+                        gentrified1518 = ifelse(meets_vuln1518 == 1 & meets_soc1518 == 1 &  meets_inv1518 == 1, 1, 0),
+                        type1518 = case_when(meets_vuln1518 == 0 & gentrified1518 == 0 ~ "Not vulnerable",
+                                             meets_vuln1518 == 1 & gentrified1518 == 0 ~ "Vulnerable, did not gentrify",
+                                             meets_vuln1518 == 1 & gentrified1518 == 1 ~ "Vulnerable, gentrified"))
 
-# Test
+# Split dataframe
+data_one <- data %>% select(GEOID, NAME.y, geometry,
+                            meets_vuln1218, meets_soc1218, meets_inv1218,
+                            basehhinc, basenoba, basenonwhite, baserenters, 
+                            chgba, chghhinc, chgnonhispwh, chgmedrent, chgmedhome,
+                            gentrified1218, type1218)
+data_two <- data %>% select(GEOID, NAME.y, geometry,
+                            meets_vuln1215, meets_soc1215, meets_inv1215,
+                            meets_vuln1518, meets_soc1518, meets_inv1518,
+                            basehhinc1215, basenoba1215, basenonwhite1215, baserenters1215, 
+                            chgba1215, chghhinc1215, chgnonhispwh1215, chgmedrent1215, chgmedhome1215,
+                            basehhinc1518, basenoba1518, basenonwhite1518, baserenters1518, 
+                            chgba1518, chghhinc1518, chgnonhispwh1518, chgmedrent1518, chgmedhome1518,
+                            gentrified1215, gentrified1518,
+                            type1215, type1518)
+
+  
+# One time period
 ggplot() +
-  geom_sf(data = data, size = 0.2) +
-  geom_sf(data = data[data$meets_vuln == 1, ], aes(fill = "#440154")) +
+  geom_sf(data = data_one, size = 0.2) +
+  geom_sf(data = data[data$meets_vuln1218 == 1, ], aes(fill = "#440154")) +
   labs(title = "Fairfax County: Vulnerable") +
   theme_map() +
   theme(plot.title = element_text(size = 16, face = "bold"),
@@ -443,8 +531,8 @@ ggplot() +
   scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Vulnerable")) 
 
 ggplot() +
-  geom_sf(data = data, size = 0.2) +
-  geom_sf(data = data[data$meets_soc == 1, ], aes(fill = "#440154")) +
+  geom_sf(data = data_one, size = 0.2) +
+  geom_sf(data = data[data$meets_soc1218 == 1, ], aes(fill = "#440154")) +
   labs(title = "Fairfax County: Socioeconomic change") +
   theme_map() +
   theme(plot.title = element_text(size = 16, face = "bold"),
@@ -454,8 +542,8 @@ ggplot() +
   scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Socioeconomic\nchange")) 
 
 ggplot() +
-  geom_sf(data = data, size = 0.2) +
-  geom_sf(data = data[data$meets_inv == 1, ], aes(fill = "#440154")) +
+  geom_sf(data = data_one, size = 0.2) +
+  geom_sf(data = data[data$meets_inv1218 == 1, ], aes(fill = "#440154")) +
   labs(title = "Fairfax County: Investment change") +
   theme_map() +
   theme(plot.title = element_text(size = 16, face = "bold"),
@@ -464,9 +552,35 @@ ggplot() +
         legend.position = c(0.1, 0.1)) +
   scale_fill_identity(name = "Criterion", guide = "legend", labels = c("Investment\nchange")) 
 
+show_col(viridis_pal(option = "")(10))
 
-plot(st_geometry(data), col = data$meets_vuln)
-plot(st_geometry(data), col = data$meets_soc)
-plot(st_geometry(data), col = data$meets_inv)
+ggplot(data = data_one) +
+  geom_sf(aes(fill = type1218), size = 0.2) +
+  labs(title = "Fairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+# Two time periods
+ggplot(data = data_two) +
+  geom_sf(aes(fill = type1215), size = 0.2) +
+  labs(title = "Fairfax County Tract-Level Gentrification\n2008/12 to 2011/15") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+ggplot(data = data_two) +
+  geom_sf(aes(fill = type1518), size = 0.2) +
+  labs(title = "Fairfax County Tract-Level Gentrification\n2011/15 to 2015/18") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
 
 # DEAL WITH NAS!!!!
