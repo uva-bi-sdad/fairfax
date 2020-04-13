@@ -166,7 +166,106 @@ miss_var_summary(acs0812)
 
 
 #
-# FOR NOW: COMPLETE CASE 2014/18 AND 2008/12 ONLY! ----------------------------------------------------------------------------
+# From 02_fillin.R file, replace NAs with latest available value  ---------------------------------------------------------------------
+#
+
+# 02_fillin.R finds the latest available value, assigned here to NAs in median house price,
+# median gross rent, and median household income. 
+# Backhouse/rent and fronthouse/rent variables are assigned values that equal the latest available year 
+# from which the value is pulled. 
+
+# Missingness in 2018
+# Rent: 15 missing, 10 have values in previous years (3 in 2017, 2 in 2016, 1 in 2015, 3 in 2014, 1 in 2013)
+# House 8 missing, 1 has value in previous years (1 in 2017)
+# Income: 3 missing, none have values in previous years
+
+# Missingness in 2012
+# Rent: 6 missing, 1 has value in previous years (1 in 2011)
+# House: 7 missing, 1 has value in previous years (1 in 2010)
+# Income: 3 missing, none have values in previous years
+
+# Reasons:
+# https://www2.census.gov/programs-surveys/acs/tech_docs/data_suppression/ACSO_Data_Suppression.pdf
+# “For detailed tables, a table is filtered out if the median coefficient of variation (CV) is greater than 0.61.
+# ACS suppresses medians when the margins of error associated with the medians was larger than the median itself.
+# (That median is statistically unreliable.)
+
+# Fill in house for 2012
+acs0812$backhouse <- NA
+acs0812[acs0812$GEOID == "51059421900", ]$backhouse <- 2010
+acs0812[acs0812$GEOID == "51059421900", ]$B25077_001E <- 350000
+
+# Fill in rent for 2012
+acs0812$backrent <- NA
+acs0812[acs0812$GEOID == "51059491101", ]$backrent <- 2011
+acs0812[acs0812$GEOID == "51059491101", ]$B25064_001E <- 2001
+
+# Fill in house for 2018
+acs1418$fronthouse <- NA
+acs1418[acs1418$GEOID == "51059451602", ]$fronthouse <- 2017
+acs1418[acs1418$GEOID == "51059451602", ]$B25077_001E <- 233600
+
+# Fill in rent for 2018
+acs1418$frontrent <- NA
+acs1418[acs1418$GEOID == "51059415600", ]$frontrent <- 2013
+acs1418[acs1418$GEOID == "51059415600", ]$B25064_001E <- 2001
+
+acs1418[acs1418$GEOID == "51059481600", ]$frontrent <- 2012
+acs1418[acs1418$GEOID == "51059481600", ]$B25064_001E <- 2001
+
+acs1418[acs1418$GEOID == "51059450800", ]$frontrent <- 2017
+acs1418[acs1418$GEOID == "51059450800", ]$B25064_001E <- 1462
+
+acs1418[acs1418$GEOID == "51059482400", ]$frontrent <- 2014
+acs1418[acs1418$GEOID == "51059482400", ]$B25064_001E <- 2001
+
+acs1418[acs1418$GEOID == "51059480300", ]$frontrent <- 2014
+acs1418[acs1418$GEOID == "51059480300", ]$B25064_001E <- 2001
+
+acs1418[acs1418$GEOID == "51059492100", ]$frontrent <- 2015
+acs1418[acs1418$GEOID == "51059492100", ]$B25064_001E <- 3501
+
+acs1418[acs1418$GEOID == "51059480201", ]$frontrent <- 2016
+acs1418[acs1418$GEOID == "51059480201", ]$B25064_001E <- 3501
+
+acs1418[acs1418$GEOID == "51059480501", ]$frontrent <- 2017
+acs1418[acs1418$GEOID == "51059480501", ]$B25064_001E <- 2776
+
+acs1418[acs1418$GEOID == "51059480503", ]$frontrent <- 2016
+acs1418[acs1418$GEOID == "51059480503", ]$B25064_001E <- 1935
+
+acs1418[acs1418$GEOID == "51059460100", ]$frontrent <- 2017
+acs1418[acs1418$GEOID == "51059460100", ]$B25064_001E <- 3501
+
+acs1418[acs1418$GEOID == "51059491502", ]$frontrent <- 2014
+acs1418[acs1418$GEOID == "51059491502", ]$B25064_001E <- 2001
+
+# Check for completeness again (estimates only)
+# ACS 04-18 tract (var, cases, percent)
+miss_var_summary(acs1418)
+# 5 B25077_001E      7     2.71
+# 7 B25064_001E      4     1.55
+# 8 B19013_001E      3     1.16
+
+# ACS 08-12 tract (var, cases, percent)
+miss_var_summary(acs0812)
+# 5 B25077_001E      6     2.33
+# 6 B25064_001E      5     1.94
+# 8 B19013_001E      3     1.16
+
+# Which tracts have missing data? 
+test1418 <- acs1418 %>% filter(is.na(B25064_001E) | is.na(B25077_001E) | is.na(B19013_001E)) # 8 tracts
+test0812 <- acs0812 %>% filter(is.na(B25064_001E) | is.na(B25077_001E) | is.na(B19013_001E)) # 8 tracts
+
+setdiff(test1418$GEOID, test0812$GEOID)
+# 2018: "51059421900" "51059416200" "51059491000" "51059461902" "51059491202" "51059980100" "51059980200" "51059980300"
+# 2012: "51059492201" "51059416200" "51059491000" "51059461902" "51059491202" "51059980100" "51059980200" "51059980300"
+
+# Missing on: "51059421900" "51059492201" "51059416200" "51059491000" "51059461902" "51059491202" "51059980100" "51059980200" "51059980300"
+    
+
+#
+# Select complete cases ----------------------------------------------------------------------------
 #
 
 acs1418 <- acs1418 %>% filter(!is.na(B25064_001E) & !is.na(B25077_001E) & !is.na(B19013_001E))
@@ -203,7 +302,7 @@ acs0812 <- acs0812 %>% mutate(
                       B02001_008E) / B02001_001E * 100, 
   tct_renters12 = B25003_003E / B25003_001E * 100, 
   tct_withba12 = (B15003_022E + B15003_023E + B15003_024E + B15003_025E) / B15003_001E * 100, 
-  tct_medinc12 = B19013_001E,  
+  tct_medinc12 = B19013_001E * (369.8 / 337.5),
   tct_nonhispwh12 = B03002_003E / B03002_001E * 100,  
   tct_medrent12 = B25064_001E * (369.8 / 337.5),
   tct_medhome12 = B25077_001E * (369.8 / 337.5)) %>% 
@@ -229,6 +328,8 @@ ffx <- st_as_sf(ffx)
 # County
 cty <- full_join(acs1418cty, acs0812cty)
 
+# Note: Missingness is on that one tract that isn't missing from both time periods. Can filter out.
+
 
 #
 # Calculate -------------------------------------------------------------------------------------------------------------
@@ -242,7 +343,7 @@ cty <- cty %>% mutate(
   cgh1218_cty_medrent = cty_medrent18 - cty_medrent12,
   cgh1218_cty_medhome = cty_medhome18 - cty_medhome12)
 
-# JUST FOR NOW: FILTER OUT IF INFO FOR BOTH TIME POINTS UNAVAILABLE
+# Filter out if info is unavailable
 ffx <- ffx %>% filter(!is.na(tct_hhinc18) & !is.na(tct_hhinc12) &
                       !is.na(tct_medrent18) & !is.na(tct_medrent12) &
                       !is.na(tct_medhome18) & !is.na(tct_medhome12))
@@ -256,7 +357,7 @@ ffx <- ffx %>% mutate(
   cgh1218_tct_medhome = tct_medhome18 - tct_medhome12)
 
 # Individual criterions
-data <- ffx %>% transmute(GEOID = GEOID,
+data <- ffx %>% mutate(GEOID = GEOID,
                           NAME.y = NAME.y, 
                           geometry = geometry,
                           basehhinc = ifelse(tct_hhinc12 < acs0812cty$cty_hhinc12, 1, 0),
@@ -277,6 +378,17 @@ data <- data %>% mutate(meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwh
                         type1218 = case_when(meets_vuln1218 == 0 ~ "Not vulnerable",
                                              meets_vuln1218 == 1 & gentrified1218 == 0 ~ "Vulnerable, did not gentrify",
                                              meets_vuln1218 == 1 & gentrified1218 == 1 ~ "Vulnerable, gentrified"))
+
+#
+# Descriptives ----------------------------------------------------------------------------------
+#
+
+# Get descriptives at this step in 03_desc.R.
+
+
+#
+# Plotting ----------------------------------------------------------------------------------
+#
 
 # Select
 data <- data %>% select(GEOID, NAME.y, geometry,
@@ -339,4 +451,3 @@ ggplot(data = data) +
         legend.text = element_text(size = 11)) +
   scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
 
-# DEAL WITH NAS!!!!
