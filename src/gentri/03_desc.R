@@ -5,7 +5,16 @@ options(scipen = 999)
 
 descriptives <- data
 
-# Descriptive plots
+# In a different universe I loop over these.
+
+#
+# Descriptive plots --------------------------------------------------------------------------
+#
+
+# Median household income
+minhhinc <- floor(min(c(min(descriptives$tct_hhinc18), min(descriptives$tct_hhinc12))))
+maxhhinc <- ceiling(max(c(max(descriptives$tct_hhinc18), max(descriptives$tct_hhinc12))))
+
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
   geom_sf(data = descriptives, size = 0.2, aes(fill = tct_hhinc18)) +
@@ -14,8 +23,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "Median\nhousehold\nincome", guide = "legend") 
+  scale_fill_viridis_c(name = "Median\nhousehold\nincome",
+                       limits = c(minhhinc, maxhhinc), 
+                       breaks = seq(minhhinc, maxhhinc, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_hhinc18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_hhinc12)) +
+  labs(title = "Median household income, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis_c(name = "Median\nhousehold\nincome",
+                       limits = c(minhhinc, maxhhinc), 
+                       breaks = seq(minhhinc, maxhhinc, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_hhinc12.png", plot = last_plot(), height = 7, width = 7)
+
+# No BA degree
+minnoba <- floor(min(c(min(descriptives$tct_noba18), min(descriptives$tct_noba12))))
+maxnoba <- ceiling(max(c(max(descriptives$tct_noba18), max(descriptives$tct_noba12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -25,8 +53,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "% without\nBA", guide = "legend") 
+  scale_fill_viridis(name = "% without\nBA",
+                     limits = c(minnoba, maxnoba), 
+                     breaks = seq(minnoba, maxnoba, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_noba18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_noba12)) +
+  labs(title = "% without BA, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "% without\nBA",
+                     limits = c(minnoba, maxnoba), 
+                     breaks = seq(minnoba, maxnoba, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_noba12.png", plot = last_plot(), height = 7, width = 7)
+
+# Nonwhite
+minnonwhite <- floor(min(c(min(descriptives$tct_nonwhite18), min(descriptives$tct_nonwhite12))))
+maxnonwhite <- ceiling(max(c(max(descriptives$tct_nonwhite18), max(descriptives$tct_nonwhite12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -36,8 +83,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "% non-white", guide = "legend") 
+  scale_fill_viridis(name = "% non-white",
+                     limits = c(minnonwhite, maxnonwhite), 
+                     breaks = seq(minnonwhite, maxnonwhite, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_nonwhite18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_nonwhite12)) +
+  labs(title = "% non-white, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "% non-white",
+                     limits = c(minnonwhite, maxnonwhite), 
+                     breaks = seq(minnonwhite, maxnonwhite, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_nonwhite12.png", plot = last_plot(), height = 7, width = 7)
+
+# Renters
+minrenters <- floor(min(c(min(descriptives$tct_renters18), min(descriptives$tct_renters12))))
+maxrenters <- ceiling(max(c(max(descriptives$tct_renters18), max(descriptives$tct_renters12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -47,8 +113,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "% renters", guide = "legend") 
+  scale_fill_viridis(name = "% renters",
+                     limits = c(minrenters, maxrenters), 
+                     breaks = seq(minrenters, maxrenters, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_renters18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_renters12)) +
+  labs(title = "% renters, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "% renters",
+                     limits = c(minrenters, maxrenters), 
+                     breaks = seq(minrenters, maxrenters, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_renters12.png", plot = last_plot(), height = 7, width = 7)
+
+# Non Hispanic white
+minnonhispwh <- floor(min(c(min(descriptives$tct_nonhispwh18), min(descriptives$tct_nonhispwh12))))
+maxnonhispwh <- ceiling(max(c(max(descriptives$tct_nonhispwh18), max(descriptives$tct_nonhispwh12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -58,8 +143,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "% non-Hispanic\nwhite", guide = "legend") 
+  scale_fill_viridis(name = "% non-Hispanic\nwhite",
+                     limits = c(minnonhispwh, maxnonhispwh), 
+                     breaks = seq(minnonhispwh, maxnonhispwh, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_nonhispwh18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_nonhispwh12)) +
+  labs(title = "% non-Hispanic white, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "% non-Hispanic\nwhite",
+                     limits = c(minnonhispwh, maxnonhispwh), 
+                     breaks = seq(minnonhispwh, maxnonhispwh, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_nonhispwh12.png", plot = last_plot(), height = 7, width = 7)
+
+# Median gross rent
+minmedrent <- floor(min(c(min(descriptives$tct_medrent18), min(descriptives$tct_medrent12))))
+maxmedrent <- ceiling(max(c(max(descriptives$tct_medrent18), max(descriptives$tct_medrent12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -69,8 +173,27 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "Median gross\nrent", guide = "legend") 
+  scale_fill_viridis(name = "Median gross\nrent",
+                     limits = c(minmedrent, maxmedrent), 
+                     breaks = seq(minmedrent, maxmedrent, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_medrent18.png", plot = last_plot(), height = 7, width = 7)
+
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_medrent12)) +
+  labs(title = "Median gross rent, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "Median gross\nrent",
+                     limits = c(minmedrent, maxmedrent), 
+                     breaks = seq(minmedrent, maxmedrent, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_medrent12.png", plot = last_plot(), height = 7, width = 7)
+
+# House value
+minmedhome <- floor(min(c(min(descriptives$tct_medhome18), min(descriptives$tct_medhome12))))
+maxmedhome <- ceiling(max(c(max(descriptives$tct_medhome18), max(descriptives$tct_medhome12))))
 
 ggplot() +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
@@ -80,10 +203,29 @@ ggplot() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_viridis(name = "Median house\nvalue", guide = "legend") 
+  scale_fill_viridis(name = "Median house\nvalue",
+                     limits = c(minmedhome, maxmedhome), 
+                     breaks = seq(minmedhome, maxmedhome, length.out = 5))
 ggsave(path = "./docs/gentri/", device = "png", filename = "tct_medhome18.png", plot = last_plot(), height = 7, width = 7)
 
-# Descriptive tables
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = descriptives, size = 0.2, aes(fill = tct_medhome12)) +
+  labs(title = "Median house value, 2008/12") +
+  theme_map() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_viridis(name = "Median house\nvalue",
+                     limits = c(minmedhome, maxmedhome), 
+                     breaks = seq(minmedhome, maxmedhome, length.out = 5))
+ggsave(path = "./docs/gentri/", device = "png", filename = "tct_medhome12.png", plot = last_plot(), height = 7, width = 7)
+
+
+#
+# Descriptive tables ----------------------------------------------------------------
+#
+
 out <- descriptives %>% st_set_geometry(NULL) %>%
                   group_by(type1218) %>% 
                   summarize(count = n(),
