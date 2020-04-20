@@ -339,9 +339,12 @@ cty <- full_join(acs1418cty, acs0812cty)
 cty <- cty %>% mutate(
   chg1218_cty_withba = cty_withba18 - cty_withba12,
   chg1218_cty_hhinc = cty_hhinc18 - cty_hhinc12,
+  chg1218_cty_hhinc_pct = (cty_hhinc18 * 100 / cty_hhinc12) - 100,
   chg1218_cty_nonhispwh = cty_nonhispwh18 - cty_nonhispwh12,
-  cgh1218_cty_medrent = cty_medrent18 - cty_medrent12,
-  cgh1218_cty_medhome = cty_medhome18 - cty_medhome12)
+  chg1218_cty_medrent = cty_medrent18 - cty_medrent12,
+  chg1218_cty_medrent_pct = (cty_medrent18 * 100 / cty_medrent12) - 100,
+  chg1218_cty_medhome = cty_medhome18 - cty_medhome12,
+  chg1218_cty_medhome_pct = (cty_medhome18 * 100 / cty_medhome12) - 100)
 
 # Filter out if info is unavailable
 ffx <- ffx %>% filter(!is.na(tct_hhinc18) & !is.na(tct_hhinc12) &
@@ -352,9 +355,13 @@ ffx <- ffx %>% filter(!is.na(tct_hhinc18) & !is.na(tct_hhinc12) &
 ffx <- ffx %>% mutate(
   chg1218_tct_withba = tct_withba18 - tct_withba12,
   chg1218_tct_hhinc = tct_hhinc18 - tct_hhinc12, 
+  chg1218_tct_hhinc_pct = (tct_hhinc18 * 100 / tct_hhinc12) - 100,
   chg1218_tct_nonhispwh = tct_nonhispwh18 - tct_nonhispwh12,
-  cgh1218_tct_medrent = tct_medrent18 - tct_medrent12,
-  cgh1218_tct_medhome = tct_medhome18 - tct_medhome12)
+  chg1218_tct_medrent = tct_medrent18 - tct_medrent12,
+  chg1218_tct_medrent_pct = (tct_medrent18 * 100 / tct_medrent12) - 100,
+  chg1218_tct_medhome = tct_medhome18 - tct_medhome12,
+  chg1218_tct_medhome_pct = (tct_medhome18 * 100 / tct_medhome12) - 100,
+  chg1218_tct_renters = tct_renters18 - tct_renters12)
 
 # Individual criterions
 data <- ffx %>% mutate(GEOID = GEOID,
@@ -365,10 +372,10 @@ data <- ffx %>% mutate(GEOID = GEOID,
                           basenonwhite = ifelse(tct_nonwhite12 > acs0812cty$cty_nonwhite12, 1, 0),
                           baserenters = ifelse(tct_renters12 > acs0812cty$cty_renters12, 1, 0),
                           chgba = ifelse(chg1218_tct_withba > cty$chg1218_cty_withba, 1, 0),
-                          chghhinc = ifelse(chg1218_tct_hhinc > cty$chg1218_cty_hhinc, 1, 0),
+                          chghhinc = ifelse(chg1218_tct_hhinc_pct > cty$chg1218_cty_hhinc_pct, 1, 0),
                           chgnonhispwh = ifelse(chg1218_tct_nonhispwh > cty$chg1218_cty_nonhispwh, 1, 0),
-                          chgmedrent = ifelse(cgh1218_tct_medrent > cty$cgh1218_cty_medrent, 1, 0),
-                          chgmedhome = ifelse(cgh1218_tct_medhome > cty$cgh1218_cty_medhome, 1, 0))
+                          chgmedrent = ifelse(chg1218_tct_medrent_pct > cty$chg1218_cty_medrent_pct, 1, 0),
+                          chgmedhome = ifelse(chg1218_tct_medhome_pct > cty$chg1218_cty_medhome_pct, 1, 0))
 
 # Group criteria
 data <- data %>% mutate(meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwhite + baserenters > 2, 1, 0),
@@ -380,7 +387,7 @@ data <- data %>% mutate(meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwh
                                              meets_vuln1218 == 1 & gentrified1218 == 1 ~ "Vulnerable, gentrified"))
 
 #
-# Descriptives ----------------------------------------------------------------------------------
+# Descriptives  ----------------------------------------------------------------------------------
 #
 
 # Get descriptives at this step in 03_desc.R.
