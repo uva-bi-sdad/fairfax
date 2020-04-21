@@ -387,7 +387,7 @@ data <- data %>% mutate(meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwh
                                              meets_vuln1218 == 1 & gentrified1218 == 1 ~ "Vulnerable, gentrified"))
 
 #
-# Descriptives  ----------------------------------------------------------------------------------
+# Descriptives & model ----------------------------------------------------------------------------------
 #
 
 # Get descriptives at this step in 03_desc.R.
@@ -397,12 +397,7 @@ data <- data %>% mutate(meets_vuln1218 = ifelse(basehhinc + basenoba + basenonwh
 # Plotting ----------------------------------------------------------------------------------
 #
 
-# Select
-data <- data %>% select(GEOID, NAME.y, geometry,
-                        meets_vuln1218, meets_soc1218, meets_inv1218,
-                        basehhinc, basenoba, basenonwhite, baserenters, 
-                        chgba, chghhinc, chgnonhispwh, chgmedrent, chgmedhome,
-                        gentrified1218, type1218)
+# Check
 table(data$meets_inv1218, useNA = "always")
 table(data$meets_vuln1218, useNA = "always")
 table(data$meets_soc1218, useNA = "always")

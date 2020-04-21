@@ -180,14 +180,3 @@ ffx_covars <- ffx_covars %>% mutate(
 alldata <- left_join(data, ffx_covars, by = "GEOID")
 
 
-
-
-
-
-
-
-# Join with "data" object from 01_gentrif.R
-
-
-
-
