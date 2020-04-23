@@ -19,8 +19,6 @@ acstables <- c(
   "B07003",
   # occupancy status
   "B25002",
-  # travel time to work
-  "B08135",
   # means of transportation to work
   "B08101",
   # household type for children
@@ -29,30 +27,16 @@ acstables <- c(
   "B11001",
   # employment status
   "B23025",
-  # gini index
-  "B19083",
   # poverty status
   "B06012",
   # units in structure
   "B25024",
   # year moved in
   "B25026",
-  # education
-  "B15003",
   # race and ethnicity
   "B03002",
   # tenure
   "B25003",
-  # house value upper quartile
-  "B25078",
-  # median housing value
-  "B25077",
-  # hh income upper quintile limits
-  "B19080",
-  # median hh income
-  "B19013",
-  # median gross rent
-  "B25064",
   # year built
   "B25034"
 )
@@ -101,16 +85,13 @@ acsdata12 <- acsdata12 %>% select(1:13, NAME, ends_with("E"), geometry)
 #
 
 # Missingness in 2018: 
-# B25064 median gross rent (15), B08135 travel time to work (14), B25077 median housing value (8),
-# B25078 house value upper quartile (7), B19083 gini index (3), 	
-# B19080 hh income upper quintile limits(3), B19013 median hh income (3)
+# Nothing missing on these variables.
 missvar18 <- miss_var_summary(acsdata18) 
 miss_case_summary(acsdata18)
 miss_case_table(acsdata18)
 
 # Missingness in 2012:
-# B08135 travel time to work (34), B25078 house value upper quartile (7), B25064 median gross rent (6),
-# B19083 gini index (3), B19080 hh income upper quintile limits (3)
+# Nothing missing on these variables.
 missvar12 <- miss_var_summary(acsdata12)
 miss_case_summary(acsdata12)
 miss_case_table(acsdata12)
@@ -131,6 +112,7 @@ miss_case_table(acsdata12)
 # chg1218_tct_nonhispwh Change in Percent Non-Hispanic White (00–16)
 # tct_renters12         Percent Renter Occupied (2000)
 # chg1218_tct_medhome   Change in Median Home Value (00–16)
+# chg1218_tct_renters   Change in percent renters
 
 # Calculate
 acsdata12 <- acsdata12 %>% mutate(
