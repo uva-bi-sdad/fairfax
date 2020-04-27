@@ -4,6 +4,7 @@ library(acs)
 library(dplyr)
 library(sf)
 library(naniar)
+library(readr)
 
 census_api_key("548d39e0315b591a0e9f5a8d9d6c1f22ea8fafe0") # Teja's key
 
@@ -161,4 +162,6 @@ ffx_covars <- ffx_covars %>% mutate(
 # Join with data from 01_gentrif.R
 alldata <- left_join(data, ffx_covars, by = "GEOID")
 
+# Write out
+write_rds(alldata, "./rivanna_data/working/gentri/alldata.Rds")
 

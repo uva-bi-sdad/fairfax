@@ -4,21 +4,26 @@ library(spdep)
 library(nnet)
 library(MASS)
 library(coda)
+library(readr)
+library(dplyr)
 
 options(scipen = 999)
 
 # For multinomial (no spatial effects): https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
 # For spatial effects: https://cran.r-project.org/web/packages/CARBayes/vignettes/CARBayes.pdf
 
-# Start with alldata object from 03_getvars.R.
+# Starts with alldata object from 03_getvars.R.
 
 
 #
 # Prepare ------------------------------------------------------------------------------------------
 #
 
+# Read
+rundata <- read_rds("./rivanna_data/working/gentri/alldata.Rds")
+
 # Create sp object
-rundata <- as(alldata, "Spatial")
+rundata <- as(rundata, "Spatial")
 
 
 #
@@ -154,6 +159,18 @@ length(Wlist)
 
 # Create neighborhood matrix
 W <- nb2mat(Wnb, style = "B")
+
+# Try MVS.CARleroux
+chain1 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
+                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
+                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
+chain2 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
+                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
+                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
+chain3 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
+                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
+                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
+
 
 # Inference for this model is based on 3 parallel Markov chains, each of which has been run 
 # for 300,000 samples, the first 100,000 of which have been removed as the burn-in period. 
