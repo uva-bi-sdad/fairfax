@@ -1,16 +1,13 @@
-library(CARBayes)
-library(sp)
-library(spdep)
 library(nnet)
 library(MASS)
-library(coda)
 library(readr)
 library(dplyr)
+library(reshape2)
+library(ggplot2)
 
 options(scipen = 999)
 
 # For multinomial (no spatial effects): https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
-# For spatial effects: https://cran.r-project.org/web/packages/CARBayes/vignettes/CARBayes.pdf
 
 # Starts with alldata object from 03_getvars.R.
 
@@ -21,9 +18,6 @@ options(scipen = 999)
 
 # Read
 rundata <- read_rds("./rivanna_data/working/gentri/alldata.Rds")
-
-# Create sp object
-rundata <- as(rundata, "Spatial")
 
 
 #
@@ -39,26 +33,18 @@ rundata$type1218 <- relevel(rundata$type1218, ref = "Vulnerable, did not gentrif
 # Output includes some iteration history and includes the final log-likelihood.
 # This value multiplied by two is then seen in the model summary as the Residual Deviance 
 # and it can be used in comparisons of nested models.
-testmodel <- multinom(type1218 ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                        tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data)
+
+testmodel <- multinom(type1218 ~ tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + chg1218_tct_renters + 
+                        chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
+                        chg1218_tct_popgrowth + chg1218_tct_housdens,
+                 data = rundata)
+# stepAIC(testmodel, trace = TRUE)
+
 summary(testmodel)
 
-testmodel <- multinom(type1218 ~ tct_withba12 + tct_hhinc12 + tct_nonwhite12 + tct_medhome12 + 
-                   tct_inpov12 + tct_medrent12 + tct_unemp12 + chg1218_tct_withba + chg1218_tct_hhinc + 
-                   chg1218_tct_nonhispwh + tct_multunit12 + tct_diffhou12 + tct_renters12 + tct_nonfam12 + 
-                   tct_singfam12 + chg1218_tct_singfam +  tct_vacant12 + chg1218_tct_renters + 
-                   chg1218_tct_nonfam + tct_transit12 + tct_popdens12 + tct_newbuild18 + 
-                   chg1218_tct_housdens + chg1218_tct_popdens + tct_rentburd12 + chg1218_tct_medhome + 
-                   chg1218_tct_popgrowth,
-                 data = rundata@data)
-stepAIC(testmodel, trace = TRUE)
-
-testmodel <- multinom(formula = type1218 ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                        tct_newbuild18 + tct_singfam12 + tct_transit12,
-                        data = rundata@data)
-summary(testmodel)
 # Display as risk ratios (extract coefficients from the model and exponentiate)
 exp(coef(testmodel))
+
 
 # Calculate Z scores
 # The multinom command does not include p-value calculation for the regression coefficients, 
@@ -73,15 +59,51 @@ p
 # Calculate predicted probabilities
 head(pp <- fitted(testmodel))
 
+# Unlike logistic regression where there are many statistics for performing model diagnostics, 
+# it is not as straightforward to do diagnostics with multinomial logistic regression models. 
+# For the purpose of detecting outliers or influential data points, one can run separate logit 
+# models and use the diagnostics tools on each model.
+
 
 #
-# Non-spatial model (binary logistic) ---------------------------------------------------------
+# Plot -----------------------------------------------------------------------------
 #
 
-# Turns out you can't compute this on a multinomial model because it only works on one set of
-# coefficients at a time. Using binary logistic to predict gentrified vs. all others instead.
+# Look at the averaged predicted probabilities for different values of the predictor variables.
 
-# Variables
+dfpred <- data.frame(chg1218_tct_medrent_pct = rep(c(-20:50)), chg1218_tct_renters = mean(rundata$chg1218_tct_renters),
+                     tct_diffhou12 = mean(rundata$tct_diffhou12), tct_newbuild18 = mean(rundata$tct_newbuild18), 
+                     tct_multunit12 = mean(rundata$tct_multunit12), tct_transit12 = mean(rundata$tct_transit12), 
+                     chg1218_tct_medhome_pct = mean(rundata$chg1218_tct_medhome_pct), 
+                     chg1218_tct_singfam = mean(rundata$chg1218_tct_singfam), 
+                     chg1218_tct_popgrowth = mean(rundata$chg1218_tct_popgrowth),
+                     chg1218_tct_housdens = mean(rundata$chg1218_tct_housdens))
+
+# store the predicted probabilities for each value of chg1218_tct_medrent_pct and chg1218_tct_renters
+pprobs <- cbind(dfpred, predict(testmodel, newdata = dfpred, type = "probs", se = TRUE))
+
+# calculate the mean probabilities within each level of chg1218_tct_medrent_pct
+by(pprobs[, 11:13], pprobs$chg1218_tct_medrent_pct, colMeans)
+
+# reshape
+lpp <- melt(pprobs, id.vars = c("chg1218_tct_medrent_pct"), value.name = "probability")
+head(lpp)  # view first few rows
+lpp <- lpp[640:852, ]
+
+# plot
+ggplot(lpp, aes(x = chg1218_tct_medrent_pct, y = probability)) + 
+  geom_line() + 
+  facet_grid(variable ~ ., scales = "free")
+
+# Look at:
+# https://thomasleeper.com/Rcourse/Tutorials/nominalglm.html
+# https://cran.r-project.org/web/packages/MNLpred/vignettes/OVA_Predictions_For_MNL.html
+
+
+#
+# Variables ---------------------------------------------------------
+#
+
 # tct_withba12
 # tct_nonwhite12
 # tct_hhinc12
@@ -118,26 +140,10 @@ head(pp <- fitted(testmodel))
 # tct_housdens12
 # tct_totalpop12
 
-table(rundata$gentrified1218)
 
-# Stepwise
-testmodel <- glm(gentrified1218 ~ tct_withba12 + tct_hhinc12 + tct_nonwhite12 + tct_medhome12 + 
-                   tct_inpov12 + tct_medrent12 + tct_unemp12 + chg1218_tct_withba + chg1218_tct_hhinc + 
-                   chg1218_tct_nonhispwh + tct_multunit12 + tct_diffhou12 + tct_renters12 + tct_nonfam12 + 
-                   tct_singfam12 + chg1218_tct_singfam +  tct_vacant12 + chg1218_tct_renters + 
-                   chg1218_tct_nonfam + tct_transit12 + tct_popdens12 + tct_newbuild18 + 
-                   chg1218_tct_housdens + chg1218_tct_popdens + tct_rentburd12 + chg1218_tct_medhome + 
-                   chg1218_tct_popgrowth,
-                  data = rundata@data, family = binomial(link = "logit"))
-
-stepAIC(testmodel, trace = TRUE)
-summary(testmodel)
-
-# Harris county final model
-testmodel <- glm(gentrified1218 ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                 tct_newbuild18 + tct_singfam12 + tct_transit12,
-                 data = rundata@data, family = binomial(link = "logit"))
-summary(testmodel)
+#
+# Try a spatial model --------------------------------------------------------
+#
 
 # Compute Moran’s I statistic
 # To quantify the presence of spatial autocorrelation in the model residuals
@@ -147,52 +153,3 @@ summary(testmodel)
 Wnb <- poly2nb(rundata) # turn data into a neighborhood (nb) object
 Wlist <- nb2listw(Wnb, style = "B") # turn data into a listw object, the required form of binary spatial adjacency information (based on border sharing) used by the moran.mc function
 moran.mc(x = residuals(testmodel), listw = Wlist, nsim = 5000) # run spatial autocorrelation test
-
-length(resid(testmodel)) 
-length(Wlist)
-
-#
-# Try a spatial model --------------------------------------------------------
-#
-
-# S.CARleroux does not support multinomial models, only S.glm does.
-
-# Create neighborhood matrix
-W <- nb2mat(Wnb, style = "B")
-
-# Try MVS.CARleroux
-chain1 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
-                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-chain2 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
-                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-chain3 <- MVS.CARleroux(formula = as.numeric(type1218) ~ tct_tradfam12 + tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                          tct_newbuild18 + tct_singfam12 + tct_transit12, data = rundata@data, 
-                      family = "multinomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-
-
-# Inference for this model is based on 3 parallel Markov chains, each of which has been run 
-# for 300,000 samples, the first 100,000 of which have been removed as the burn-in period. 
-# The remaining 200,000 samples are thinned by 100 to reduce their temporal autocorrelation,
-# resulting in 6,000 samples for inference across the 3 Markov chains.
-
-# Try binary logistic model 
-chain1 <- S.CARleroux(formula = gentrified1218 ~ tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                                tct_newbuild18, data = rundata@data, 
-                      family = "binomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-chain2 <- S.CARleroux(formula = gentrified1218 ~ tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                                tct_newbuild18, data = rundata@data, 
-                      family = "binomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-chain3 <- S.CARleroux(formula = gentrified1218 ~ tct_rentburd12 + tct_medhome12 + tct_medrent12 + 
-                                 tct_newbuild18, data = rundata@data, 
-                      family = "binomial", W = W, burnin = 100000, n.sample = 300000, thin = 100, trials = rep(1, nrow(rundata)))
-
-# MCMC sample convergence
-summary(chain1$samples)
-
-beta.samples <- mcmc.list(chain1$samples$beta, chain2$samples$beta, chain3$samples$beta)
-plot(beta.samples[ , 2:4])
-
-# Potential scale reduction factor (value less than 1.1 is suggestive of convergence)
-gelman.diag(beta.samples)
