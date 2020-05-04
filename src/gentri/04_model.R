@@ -126,16 +126,16 @@ ggplot(lpp, aes(x = chg1218_tct_medrent_pct, y = probability)) +
 # tct_housdens18
 # tct_newbuild18
 # tct_totalpop18
-# tct_unemp12
-# tct_inpov12
+# tct_unemp12 * 
+# tct_inpov12 *
 # tct_multunit12
 # tct_diffhou12
 # tct_nonfam12
 # tct_singfam12
-# tct_vacant12
+# tct_vacant12 * 
 # tct_tradfam12
 # tct_transit12
-# tct_rentburd12
+# tct_rentburd12 *
 # tct_popdens12
 # tct_housdens12
 # tct_totalpop12

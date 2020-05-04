@@ -41,8 +41,7 @@ cl_16 <- cl_ffx_02
 
 #
 #  Geography: FIPS state, county and census track
-#  GEOID contains state and county FIPS, Census Tract, Census Block and Census Block Suffix.
-
+#  GEOID contains state (2), county (3), tract (6), block group (1) OR block (4) information
 
 cl_11$STATEFP <- substr(cl_11$fips_code, start=1, stop=2)
 cl_11$COUNTYFP <- substr(cl_11$fips_code, start=3, stop=5) 
