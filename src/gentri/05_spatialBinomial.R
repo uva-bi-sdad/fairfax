@@ -7,6 +7,7 @@ library(coda)
 library(readr)
 library(dplyr)
 library(gclus)
+library(ggplot2)
 
 options(scipen = 999)
 
@@ -76,6 +77,7 @@ cormatdata <- rundata@data %>% select(chg1218_tct_withba,
 cormat <- cov(cormatdata) 
 cpairs(cormatdata, order.single(cormat), dmat.color(cormat))
 
+
 # 
 # Try MVS.CARleroux -----------------------------------------------------------------------------------------------
 #
@@ -117,32 +119,38 @@ rundata@data$c4_vul = rundata@data$c2_vulnotg + rundata@data$c3_vulg
 #                        data = data2,
 #                        family = "multinomial", W = W, burnin = 1e5, n.sample = 2.1e6, thin = 500, trials = modeltrials)
 
-# outcome = Gentrified
+# Outcome = Gentrified
 chain1.binG <- S.CARleroux(formula = c3_vulg ~ 
-                            tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                            chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                            chg1218_tct_popgrowth + chg1218_tct_housdens,
+                            tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                            chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                            chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                            tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                            chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
                           data = rundata@data,
                           MALA = TRUE,
                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain2.binG <- S.CARleroux(formula = c3_vulg ~ 
-                            tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                            chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                            chg1218_tct_popgrowth + chg1218_tct_housdens,
+                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
                           data = rundata@data,
                           MALA = TRUE,
                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain3.binG <- S.CARleroux(formula = c3_vulg ~ 
-                            tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                            chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                            chg1218_tct_popgrowth + chg1218_tct_housdens,
+                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
                           data = rundata@data,
                           MALA = TRUE,
                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
-
+# Outcome = vulnerable
 chain1.binV <- S.CARleroux(formula = c4_vul ~ 
                             tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
                             chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
@@ -167,48 +175,23 @@ chain3.binV <- S.CARleroux(formula = c4_vul ~
                           MALA = TRUE,
                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
-
-
-
-chain1 <- MVS.CARleroux(formula = as.matrix(rundata@data[ , c("c2_vulnotg", "c1_notvul", "c3_vulg")]) ~ 
-                          tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                          chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                          chg1218_tct_popgrowth + chg1218_tct_housdens,
-                        data = rundata@data, 
-                        family = "multinomial", W = W, burnin = 1e5, n.sample = 2.1e6, thin = 500, trials = modeltrials)
-chain2 <- MVS.CARleroux(formula = as.matrix(rundata@data[ , c("c2_vulnotg", "c1_notvul", "c3_vulg")]) ~ 
-                          tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                          chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                          chg1218_tct_popgrowth + chg1218_tct_housdens,
-                        data = rundata@data, 
-                        family = "multinomial", W = W, burnin = 1e6, n.sample = 1.1e7, thin = 2000, trials = modeltrials)
-chain3 <- MVS.CARleroux(formula = as.matrix(rundata@data[ , c("c2_vulnotg", "c1_notvul", "c3_vulg")]) ~ 
-                          tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                          chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                          chg1218_tct_popgrowth + chg1218_tct_housdens,
-                        data = rundata@data, 
-                        family = "multinomial", W = W, burnin = 1e6, n.sample = 1.1e7, thin = 2000, trials = modeltrials)
-
-save.image("~/git/fairfax/src/gentri/mcmcoutBinomial.RData")
-
-# Variables I want, ideally
-# tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-# chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-# chg1218_tct_popgrowth + chg1218_tct_housdens
-
-# initially in the code:
-# chg1218_tct_renters + chg1218_tct_medhome_pct + tct_newbuild18 + 
-# chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-# chg1218_tct_housdens, data = rundata@data, 
+# save.image("~/git/fairfax/src/gentri/mcmcoutBinomial.RData")
 
 # Output:
 # (i) posterior median (Median); 
 # (ii) 95% credible intervals (2.5%, 97.5%); 
 # (iii) the effective number of independent samples (n.effective); 
 # (iv) the convergence diagnostic proposed by Geweke (1992) (Geweke.diag) as a Z-score (should be <1.96)
-print(chain1.bin)
-print(chain2.bin)
-print(chain3.bin)
+print(chain1.binG)
+print(chain2.binG)
+print(chain3.binG)
+
+# Combine results
+beta.samples.matrix <- rbind(chain1.binG$samples$beta, chain1.binG$samples$beta, chain1.binG$samples$beta)
+colnames(beta.samples.matrix) <- colnames(chain1.binG$X)
+# Then posterior medians and 95% credible intervals can be computed as follows:
+round(t(apply(beta.samples.matrix, 2, quantile, c(0.5, 0.025, 0.975))),5)
+
 
 # 
 # Model diagnostics -----------------------------------------------------------------------------------------------
@@ -223,9 +206,9 @@ print(chain3.bin)
 # http://wlm.userweb.mwn.de/R/wlmRcoda.htm
 
 # Fit indices
-chain1.bin$modelfit
-chain2.bin$modelfit
-chain3.bin$modelfit
+chain1.binG$modelfit
+chain2.binG$modelfit
+chain3.binG$modelfit
 
 # Assess MCMC sample convergence
 beta.samplesG <- mcmc.list(chain1.binG$samples$beta, chain2.binG$samples$beta, chain3.binG$samples$beta)
@@ -244,11 +227,8 @@ beta.samplesVall <- mcmc(rbind(chain1.binV$samples$beta, chain2.binV$samples$bet
 HPDinterval(beta.samplesGall)
 HPDinterval(beta.samplesVall)
 
-
 #rho.samples <- mcmc.list(chain1.bin$samples$rho, chain2.bin$samples$rho, chain3.bin$samples$rho)
 #plot(rho.samples[,1]) # values >0 show the best fit has a significant spatial correlation
-
-
 
 # Potential scale reduction factor
 # Total value less than 1.1 is suggestive of convergence.
@@ -260,18 +240,20 @@ gelman.diag(beta.samples)
 gelman.plot(beta.samples) #these should not be going back up
 
 
-# --------------------------------------------
-# output
-# --------------------------------------------
+
+#
+# Output ------------------------------------------------------------------------------------------
+#
 
 # trace plots of (beta.samples) for each of 10 variables (5x2) for the two models
 # posterior means + HPD credible intervals for each of the 10 variables for the two models (tables)
 
 # show ability to do model predictions under new covariates
 
-# --------------------------------------------
-# compare to nonspatial models
-# --------------------------------------------
+
+#
+# Compare to nonspatial models ------------------------------------------------------------------------------------------
+#
 
 chain3.binG.nonspatial <- glm(formula = c3_vulg ~ 
                                 tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
@@ -282,7 +264,6 @@ chain3.binG.nonspatial <- glm(formula = c3_vulg ~
 confint(chain3.binG.nonspatial)
 data.frame( coef(chain3.binG.nonspatial) )
 
-
 chain3.binV.nonspatial <- glm(formula = c4_vul ~ 
                              tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
                              chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
@@ -292,9 +273,10 @@ chain3.binV.nonspatial <- glm(formula = c4_vul ~
 confint(chain3.binV.nonspatial)
 data.frame( coef(chain3.binV.nonspatial) )
 
-# --------------------------------------------
-# trace plots for each model
-# --------------------------------------------
+
+#
+# Trace plots ------------------------------------------------------------------------------------------
+#
 
 pdf("~/git/fairfax/src/gentri/trace_binG.pdf",height=6,width=4)
 par(mar=c(0,0,0,0))
@@ -307,9 +289,10 @@ plot(beta.samplesV[,1:11])
 dev.off()
 
 
-# --------------------------------------------
-# AUC, goodness of model fit for each model
-# --------------------------------------------
+
+#
+# AUC, GOF ------------------------------------------------------------------------------------------
+#
 
 library(pROC)
 
@@ -322,14 +305,214 @@ plot( roc(response=rundata@data$c4_vul, predictor=chain1.binV$fitted.values), ma
 text(x=0.4,y=0.4,labels="AUC=0.84")
 dev.off()
 
-# --------------------------------------------
-# model prediction at new values of covariates
-# --------------------------------------------
+
+
+#
+# Model predictions ------------------------------------------------------------------------------------------
+#
 
 chain1.binG$fitted.values # model estimated probability of each tract to gentrify
 
 # predict( chain1.binG ) # no 'predict' method for CARBayes; need to do it manually...
 
+# Run non-spatial
+predmodel <- glm(formula = c3_vulg ~ 
+                                tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                                chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                                chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                                tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                                chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
+                              data = rundata@data,
+                              family = "binomial")
+confint(predmodel)
+data.frame( coef(predmodel) )
+
+# Create new DF holding constant and manipulating key var
+
+#
+# Model predictions: Housing price ------------------------------------------------------
+#
+
+newdata_houseprice <- with(rundata@data, 
+                           data.frame(tct_multunit12 = mean(tct_multunit12),
+                                      tct_vacant12 = mean(tct_vacant12),
+                                      tct_newbuild18 = mean(tct_newbuild18),
+                                      chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                      chg1218_tct_renters = mean(chg1218_tct_renters),
+                                      chg1218_tct_medhome_pct = seq(0, 80, by = 5),
+                                      chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                      chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                      chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                      tct_rentburd12 = mean(tct_rentburd12), 
+                                      tct_diffhou12 = mean(tct_diffhou12), 
+                                      tct_transit12 = mean(tct_transit12),
+                                      tct_unemp12 = mean(tct_unemp12),
+                                      tct_inpov12 = mean(tct_inpov12),
+                                      chg1218_tct_withba = mean(chg1218_tct_withba),
+                                      chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                      chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                      chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+      ))
+
+newdata_houseprice$housepriceP <- predict(predmodel, newdata = newdata_houseprice, type = "response")
+
+# Get SE
+newdata_houseprice <- cbind(newdata_houseprice, predict(predmodel, newdata = newdata_houseprice, type = "link",
+                                    se = TRUE))
+newdata_houseprice <- within(newdata_houseprice, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+# Plot
+ggplot(newdata_houseprice, aes(x = chg1218_tct_medhome_pct, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by percent increase in median property value", 
+       x = "% increase in median property value",
+       y = "Predicted probability") +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(0, 80, 10), limits = c(0, 80)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))
+  
+
+#
+# Model predictions: Unemployment ------------------------------------------------------
+#
+
+newdata_unempl <- with(rundata@data, 
+                           data.frame(tct_multunit12 = mean(tct_multunit12),
+                                      tct_vacant12 = mean(tct_vacant12),
+                                      tct_newbuild18 = mean(tct_newbuild18),
+                                      chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                      chg1218_tct_renters = mean(chg1218_tct_renters),
+                                      chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                      chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                      chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                      chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                      tct_rentburd12 = mean(tct_rentburd12), 
+                                      tct_diffhou12 = mean(tct_diffhou12), 
+                                      tct_transit12 = mean(tct_transit12),
+                                      tct_unemp12 = seq(0, 15, by = 5),
+                                      tct_inpov12 = mean(tct_inpov12),
+                                      chg1218_tct_withba = mean(chg1218_tct_withba),
+                                      chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                      chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                      chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                           ))
+
+newdata_unempl$unemplP <- predict(predmodel, newdata = newdata_unempl, type = "response")
+
+# Get SE
+newdata_unempl <- cbind(newdata_unempl, predict(predmodel, newdata = newdata_unempl, type = "link",
+                                                        se = TRUE))
+newdata_unempl <- within(newdata_unempl, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+# Plot
+ggplot(newdata_unempl, aes(x = tct_unemp12, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by percent unemployed", 
+       x = "% unemployed",
+       y = "Predicted probability") +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(0, 15, 5), limits = c(0, 15)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))      
 
 
+#
+# Model predictions: With BA ------------------------------------------------------
+#
+
+newdata_withba <- with(rundata@data, 
+                       data.frame(tct_multunit12 = mean(tct_multunit12),
+                                  tct_vacant12 = mean(tct_vacant12),
+                                  tct_newbuild18 = mean(tct_newbuild18),
+                                  chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                  chg1218_tct_renters = mean(chg1218_tct_renters),
+                                  chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                  chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                  chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                  tct_rentburd12 = mean(tct_rentburd12), 
+                                  tct_diffhou12 = mean(tct_diffhou12), 
+                                  tct_transit12 = mean(tct_transit12),
+                                  tct_unemp12 = mean(tct_unemp12),
+                                  tct_inpov12 = mean(tct_inpov12),
+                                  chg1218_tct_withba = seq(0, 25, by = 5),
+                                  chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                       ))
+
+newdata_withba$withbaP <- predict(predmodel, newdata = newdata_withba, type = "response")
+
+# Get SE
+newdata_withba <- cbind(newdata_withba, predict(predmodel, newdata = newdata_withba, type = "link",
+                                                se = TRUE))
+newdata_withba <- within(newdata_withba, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+# Plot
+ggplot(newdata_withba, aes(x = chg1218_tct_withba, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by percent change in population with BA", 
+       x = "% change in population with BA",
+       y = "Predicted probability") +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(0, 25, 5), limits = c(0, 25)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))   
+
+
+#
+# Model predictions: Non Hispanic white ------------------------------------------------------
+#
+
+newdata_nonhispw <- with(rundata@data, 
+                       data.frame(tct_multunit12 = mean(tct_multunit12),
+                                  tct_vacant12 = mean(tct_vacant12),
+                                  tct_newbuild18 = mean(tct_newbuild18),
+                                  chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                  chg1218_tct_renters = mean(chg1218_tct_renters),
+                                  chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                  chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                  chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                  tct_rentburd12 = mean(tct_rentburd12), 
+                                  tct_diffhou12 = mean(tct_diffhou12), 
+                                  tct_transit12 = mean(tct_transit12),
+                                  tct_unemp12 = mean(tct_unemp12),
+                                  tct_inpov12 = mean(tct_inpov12),
+                                  chg1218_tct_withba = mean(chg1218_tct_withba),
+                                  chg1218_tct_nonhispwh = seq(0, 20, by = 5),
+                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                       ))
+
+newdata_nonhispw$nonhispP <- predict(predmodel, newdata = newdata_nonhispw, type = "response")
+
+# Get SE
+newdata_nonhispw <- cbind(newdata_nonhispw, predict(predmodel, newdata = newdata_nonhispw, type = "link",
+                                                se = TRUE))
+newdata_nonhispw <- within(newdata_nonhispw, {
+  PredictedProb <- plogis(fit)
+  LL <- plogis(fit - (1.96 * se.fit))
+  UL <- plogis(fit + (1.96 * se.fit))
+})
+
+# Plot
+ggplot(newdata_nonhispw, aes(x = chg1218_tct_nonhispwh, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by percent change in non-Hispanic white population", 
+       x = "% change in non-Hispanic white population",
+       y = "Predicted probability") +
+  geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = seq(0, 20, 5), limits = c(0, 20)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))   
 
