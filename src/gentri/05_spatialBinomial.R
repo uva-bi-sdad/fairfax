@@ -329,6 +329,148 @@ data.frame( coef(predmodel) )
 
 # Create new DF holding constant and manipulating key var
 
+
+predmodelV <- glm(formula = c4_vul ~ 
+                   tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                   chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                   chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                   tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                   chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
+                 data = rundata@data,
+                 family = "binomial")
+confint(predmodelV)
+data.frame( coef(predmodelV) )
+
+
+#
+# REVISED Model predictions: Housing price ------------------------------------------------------
+#
+
+# reduce the change in home prices by X percent (0 to 50 in intervals of 5)
+reduce <- seq(0,25,by=2.5)
+
+pred_probs <- matrix(NA,nrow=nrow(rundata@data),ncol=length(reduce))
+for(i in 1:length(reduce)){
+  newdata_houseprice <- rundata@data
+  newdata_houseprice$chg1218_tct_medhome_pct <- newdata_houseprice$chg1218_tct_medhome_pct - reduce[i]
+  pred_probs[,i] <- predict(predmodel, newdata = newdata_houseprice, type = "response")
+}
+
+# do the same but for vulnerable tracts
+pred_probsV <- matrix(NA,nrow=nrow(rundata@data),ncol=length(reduce))
+for(i in 1:length(reduce)){
+  newdata_houseprice <- rundata@data
+  newdata_houseprice$chg1218_tct_medhome_pct <- newdata_houseprice$chg1218_tct_medhome_pct - reduce[i]
+  pred_probsV[,i] <- predict(predmodelV, newdata = newdata_houseprice, type = "response")
+}
+
+# look at the intervention effects on fitted probabilities: 10% reduction in housing costs (reduce[5]=10)
+# see which tracts that would gentrify will no longer gentrify
+sum( pred_probs[,1] > .5 ) # 35 tracts
+sum( pred_probs[,5] > .5 ) # 19 tracts
+which(pred_probs[,1] > .5 & pred_probs[,5] <= .5 ) # 16 no longer gentrify
+
+hist( pred_probs[,5] - pred_probs[,1] )
+
+
+
+sum( pred_probsV[,1] > .5 ) # 87 tracts
+sum( pred_probsV[,5] > .5 ) # 72 tracts
+which(pred_probsV[,1] > .5 & pred_probsV[,5] <= .5) # 15 no longer vulnerable
+
+
+# create outcome variables
+data <- st_as_sf(rundata)
+threshhold = 0.4
+
+data$type1218_predicted <- "Not vulnerable"
+data$type1218_predicted[ pred_probsV[,1] > threshhold ] <- "Vulnerable, did not gentrify"
+data$type1218_predicted[ pred_probs[,1] > threshhold ] <- "Vulnerable, gentrified"
+
+data$type1218_intervention <- "Not vulnerable"
+data$type1218_intervention[ pred_probsV[,5] > threshhold ] <- "Vulnerable, did not gentrify"
+data$type1218_intervention[ pred_probs[,5] > threshhold ] <- "Vulnerable, gentrified"
+
+table(data$type1218)
+table(data$type1218_predicted)
+table(data$type1218_intervention)
+
+#
+# Choropleth plots: 10% housing price reduction ------------------------------------------------------
+#
+
+library(tigris)
+library(ggplot2)
+library(ggthemes)
+
+ffxgeo <- tracts(state = 51, county = 059, year = 2018) 
+ffxgeo <- st_as_sf(ffxgeo)
+ffxgeo <- ffxgeo %>% select(GEOID, geometry)
+
+p1 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218), size = 0.2) +
+  labs(title = "True Outcomes\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+p2 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218_predicted), size = 0.2) +
+  labs(title = "Model Predicted Outcomes\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+p3 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218_intervention), size = 0.2) +
+  labs(title = "Intervention, 10% Housing Cost Reduction\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+pdf("~/git/fairfax/src/gentri/interventionExample.pdf",width=12,height=5)
+multiplot(p1,p2,p3,cols=3)
+dev.off()
+
 #
 # Model predictions: Housing price ------------------------------------------------------
 #
@@ -355,6 +497,8 @@ newdata_houseprice <- with(rundata@data,
       ))
 
 newdata_houseprice$housepriceP <- predict(predmodel, newdata = newdata_houseprice, type = "response")
+
+
 
 # Get SE
 newdata_houseprice <- cbind(newdata_houseprice, predict(predmodel, newdata = newdata_houseprice, type = "link",
