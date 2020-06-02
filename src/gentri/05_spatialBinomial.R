@@ -236,8 +236,8 @@ HPDinterval(beta.samplesVall)
 # A factor of 1 means that between variance and within chain variance are equal, 
 # larger values mean that there is still a notable difference between chains.
 # The gelman plot shows  the development of the scale-reduction over time (chain steps).
-gelman.diag(beta.samples)
-gelman.plot(beta.samples) #these should not be going back up
+gelman.diag(beta.samplesG)
+gelman.plot(beta.samplesG) #these should not be going back up
 
 
 
