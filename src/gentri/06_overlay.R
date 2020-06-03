@@ -39,3 +39,19 @@ ggplot(data = data) +
                     values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "#FFFFFF",
                     guide = guide_legend(override.aes = list(linetype = "blank", shape = NA)))
 
+# Plot rev zones and low inc communities
+ggplot() +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(data = revzones, size = 0.2, aes(fill = "A"), show.legend = "polygon") +
+  geom_sf(data = undesig, size = 0.2, aes(fill = "B"), show.legend = "polygon") +
+  labs(title = "Fairfax County Revitalization Zones and\nUndesignated Low-Income Communities") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11), 
+        legend.position = "right") +
+  scale_fill_manual(name = "Area", 
+                    values = c("A" = "blue", "B" = "purple"),
+                    labels = c("Revitalization zone", "Undesignated low\nincome community"),
+                    guide = guide_legend(override.aes = list(linetype = "blank", shape = NA)))
+

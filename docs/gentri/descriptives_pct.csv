@@ -1,0 +1,280 @@
+"","type1218","name","value"
+"1","Not vulnerable","count",151
+"2","Not vulnerable","mean_hhinc12",155897.281699289
+"3","Not vulnerable","min_hinc12",70524.9688888889
+"4","Not vulnerable","max_hhinc12",273927.02162963
+"5","Not vulnerable","sd_hhinc12",40630.4303440978
+"6","Not vulnerable","mean_hhinc18",156626.973509934
+"7","Not vulnerable","min_hhinc18",68889
+"8","Not vulnerable","max_hhinc18",250001
+"9","Not vulnerable","sd_hhinc18",39031.9090678293
+"10","Not vulnerable","mean_noba12",33.3673407935347
+"11","Not vulnerable","min_noba12",13.0208333333333
+"12","Not vulnerable","max_noba12",61.241610738255
+"13","Not vulnerable","sd_noba12",10.8607710559686
+"14","Not vulnerable","mean_noba18",30.7616237757687
+"15","Not vulnerable","min_noba18",9.57838722881703
+"16","Not vulnerable","max_noba18",56.1706449974606
+"17","Not vulnerable","sd_noba18",10.3718979434553
+"18","Not vulnerable","mean_nonwhite12",26.3274248274368
+"19","Not vulnerable","min_nonwhite12",3.45464135021097
+"20","Not vulnerable","max_nonwhite12",61.1475976494988
+"21","Not vulnerable","sd_nonwhite12",9.70791843555808
+"22","Not vulnerable","mean_nonwhite18",29.3149161405803
+"23","Not vulnerable","min_nonwhite18",7.75862068965517
+"24","Not vulnerable","max_nonwhite18",66.5117550574084
+"25","Not vulnerable","sd_nonwhite18",11.3471918340819
+"26","Not vulnerable","mean_renters12",16.7529980176631
+"27","Not vulnerable","min_renters12",0.509337860780985
+"28","Not vulnerable","max_renters12",82.8358208955224
+"29","Not vulnerable","sd_renters12",14.8059134899661
+"30","Not vulnerable","mean_renters18",17.0343179438313
+"31","Not vulnerable","min_renters18",0.742115027829314
+"32","Not vulnerable","max_renters18",79.2817679558011
+"33","Not vulnerable","sd_renters18",15.4001244907283
+"34","Not vulnerable","mean_withba12",66.6326592064653
+"35","Not vulnerable","min_withba12",38.758389261745
+"36","Not vulnerable","max_withba12",86.9791666666667
+"37","Not vulnerable","sd_withba12",10.8607710559686
+"38","Not vulnerable","mean_withba18",69.2383762242313
+"39","Not vulnerable","min_withba18",43.8293550025394
+"40","Not vulnerable","max_withba18",90.421612771183
+"41","Not vulnerable","sd_withba18",10.3718979434553
+"42","Not vulnerable","mean_medinc12",155897.281699289
+"43","Not vulnerable","min_medinc12",70524.9688888889
+"44","Not vulnerable","max_medinc12",273927.02162963
+"45","Not vulnerable","sd_medinc12",40630.4303440978
+"46","Not vulnerable","mean_medinc18",156626.973509934
+"47","Not vulnerable","min_medinc18",68889
+"48","Not vulnerable","max_medinc18",250001
+"49","Not vulnerable","sd_medinc18",39031.9090678293
+"50","Not vulnerable","mean_nonhispwh12",66.6594432105626
+"51","Not vulnerable","min_nonhispwh12",36.6439371479395
+"52","Not vulnerable","max_nonhispwh12",93.7454808387563
+"53","Not vulnerable","sd_nonhispwh12",11.714587553409
+"54","Not vulnerable","mean_nonhispwh18",63.5970241442202
+"55","Not vulnerable","min_nonhispwh18",31.3832695462001
+"56","Not vulnerable","max_nonhispwh18",88.991935483871
+"57","Not vulnerable","sd_nonhispwh18",12.6578878213516
+"58","Not vulnerable","mean_medrent12",2024.72983075791
+"59","Not vulnerable","min_medrent12",211.470814814815
+"60","Not vulnerable","max_medrent12",2192.50311111111
+"61","Not vulnerable","sd_medrent12",319.488510043605
+"62","Not vulnerable","mean_medrent18",2388.09271523179
+"63","Not vulnerable","min_medrent18",241
+"64","Not vulnerable","max_medrent18",3501
+"65","Not vulnerable","sd_medrent18",614.714235516454
+"66","Not vulnerable","mean_medhome12",615281.203806721
+"67","Not vulnerable","min_medhome12",279514.014814815
+"68","Not vulnerable","max_medhome12",1095704.79940741
+"69","Not vulnerable","sd_medhome12",186914.50813262
+"70","Not vulnerable","mean_medhome18",633144.370860927
+"71","Not vulnerable","min_medhome18",251900
+"72","Not vulnerable","max_medhome18",1444200
+"73","Not vulnerable","sd_medhome18",209075.518616523
+"74","Not vulnerable","mean_chgba",0.470198675496689
+"75","Not vulnerable","min_chgba",0
+"76","Not vulnerable","max_chgba",1
+"77","Not vulnerable","sd_chgba",0.500772030899857
+"78","Not vulnerable","mean_chghhinc",0.43046357615894
+"79","Not vulnerable","min_chghhinc",0
+"80","Not vulnerable","max_chghhinc",1
+"81","Not vulnerable","sd_chghhinc",0.496788805225915
+"82","Not vulnerable","mean_chgnonhispwh",0.483443708609272
+"83","Not vulnerable","min_chgnonhispwh",0
+"84","Not vulnerable","max_chgnonhispwh",1
+"85","Not vulnerable","sd_chgnonhispwh",0.501388799712181
+"86","Not vulnerable","mean_chgmedrent",0.649006622516556
+"87","Not vulnerable","min_chgmedrent",0
+"88","Not vulnerable","max_chgmedrent",1
+"89","Not vulnerable","sd_chgmedrent",0.478869160929354
+"90","Not vulnerable","mean_chgmedhome",0.370860927152318
+"91","Not vulnerable","min_chgmedhome",0
+"92","Not vulnerable","max_chgmedhome",1
+"93","Not vulnerable","sd_chgmedhome",0.484642741817587
+"94","Vulnerable, did not gentrify","count",48
+"95","Vulnerable, did not gentrify","mean_hhinc12",93513.403271605
+"96","Vulnerable, did not gentrify","min_hinc12",55283.7303703704
+"97","Vulnerable, did not gentrify","max_hhinc12",119759.319111111
+"98","Vulnerable, did not gentrify","sd_hhinc12",19275.3110567639
+"99","Vulnerable, did not gentrify","mean_hhinc18",91232.1875
+"100","Vulnerable, did not gentrify","min_hhinc18",41859
+"101","Vulnerable, did not gentrify","max_hhinc18",143688
+"102","Vulnerable, did not gentrify","sd_hhinc18",19617.2321270305
+"103","Vulnerable, did not gentrify","mean_noba12",49.6376459700474
+"104","Vulnerable, did not gentrify","min_noba12",13.0863358259687
+"105","Vulnerable, did not gentrify","max_noba12",76.9535673839185
+"106","Vulnerable, did not gentrify","sd_noba12",14.037038464231
+"107","Vulnerable, did not gentrify","mean_noba18",49.8859677357181
+"108","Vulnerable, did not gentrify","min_noba18",18.7195546276966
+"109","Vulnerable, did not gentrify","max_noba18",83.9705882352941
+"110","Vulnerable, did not gentrify","sd_noba18",14.1552016468253
+"111","Vulnerable, did not gentrify","mean_nonwhite12",48.5988102168366
+"112","Vulnerable, did not gentrify","min_nonwhite12",18.328313253012
+"113","Vulnerable, did not gentrify","max_nonwhite12",74.9777698737329
+"114","Vulnerable, did not gentrify","sd_nonwhite12",10.6738024118385
+"115","Vulnerable, did not gentrify","mean_nonwhite18",49.6704344873621
+"116","Vulnerable, did not gentrify","min_nonwhite18",32.1667111942292
+"117","Vulnerable, did not gentrify","max_nonwhite18",71.9147191471915
+"118","Vulnerable, did not gentrify","sd_nonwhite18",9.03792050749091
+"119","Vulnerable, did not gentrify","mean_renters12",43.1157056718025
+"120","Vulnerable, did not gentrify","min_renters12",9.10596026490066
+"121","Vulnerable, did not gentrify","max_renters12",81.9170632222978
+"122","Vulnerable, did not gentrify","sd_renters12",16.9640602527697
+"123","Vulnerable, did not gentrify","mean_renters18",45.2422433834679
+"124","Vulnerable, did not gentrify","min_renters18",6.82392586352148
+"125","Vulnerable, did not gentrify","max_renters18",79.6240601503759
+"126","Vulnerable, did not gentrify","sd_renters18",18.7833192913092
+"127","Vulnerable, did not gentrify","mean_withba12",50.3623540299526
+"128","Vulnerable, did not gentrify","min_withba12",23.0464326160815
+"129","Vulnerable, did not gentrify","max_withba12",86.9136641740313
+"130","Vulnerable, did not gentrify","sd_withba12",14.037038464231
+"131","Vulnerable, did not gentrify","mean_withba18",50.1140322642819
+"132","Vulnerable, did not gentrify","min_withba18",16.0294117647059
+"133","Vulnerable, did not gentrify","max_withba18",81.2804453723034
+"134","Vulnerable, did not gentrify","sd_withba18",14.1552016468253
+"135","Vulnerable, did not gentrify","mean_medinc12",93513.403271605
+"136","Vulnerable, did not gentrify","min_medinc12",55283.7303703704
+"137","Vulnerable, did not gentrify","max_medinc12",119759.319111111
+"138","Vulnerable, did not gentrify","sd_medinc12",19275.3110567639
+"139","Vulnerable, did not gentrify","mean_medinc18",91232.1875
+"140","Vulnerable, did not gentrify","min_medinc18",41859
+"141","Vulnerable, did not gentrify","max_medinc18",143688
+"142","Vulnerable, did not gentrify","sd_medinc18",19617.2321270305
+"143","Vulnerable, did not gentrify","mean_nonhispwh12",40.3239928792474
+"144","Vulnerable, did not gentrify","min_nonhispwh12",12.1109727903254
+"145","Vulnerable, did not gentrify","max_nonhispwh12",71.0090361445783
+"146","Vulnerable, did not gentrify","sd_nonhispwh12",12.0938852128689
+"147","Vulnerable, did not gentrify","mean_nonhispwh18",36.0753802747382
+"148","Vulnerable, did not gentrify","min_nonhispwh18",6.80636280208015
+"149","Vulnerable, did not gentrify","max_nonhispwh18",53.5779816513761
+"150","Vulnerable, did not gentrify","sd_nonhispwh18",12.5238464683592
+"151","Vulnerable, did not gentrify","mean_medrent12",1771.06807407407
+"152","Vulnerable, did not gentrify","min_medrent12",1191.02992592593
+"153","Vulnerable, did not gentrify","max_medrent12",2192.50311111111
+"154","Vulnerable, did not gentrify","sd_medrent12",262.482718787369
+"155","Vulnerable, did not gentrify","mean_medrent18",1823.64583333333
+"156","Vulnerable, did not gentrify","min_medrent18",1098
+"157","Vulnerable, did not gentrify","max_medrent18",2548
+"158","Vulnerable, did not gentrify","sd_medrent18",282.885999862912
+"159","Vulnerable, did not gentrify","mean_medhome12",393138.488888889
+"160","Vulnerable, did not gentrify","min_medhome12",212456.948148148
+"161","Vulnerable, did not gentrify","max_medhome12",643835.496296296
+"162","Vulnerable, did not gentrify","sd_medhome12",86783.4686064797
+"163","Vulnerable, did not gentrify","mean_medhome18",392895.833333333
+"164","Vulnerable, did not gentrify","min_medhome18",165000
+"165","Vulnerable, did not gentrify","max_medhome18",689300
+"166","Vulnerable, did not gentrify","sd_medhome18",99195.1374887824
+"167","Vulnerable, did not gentrify","mean_chgba",0.166666666666667
+"168","Vulnerable, did not gentrify","min_chgba",0
+"169","Vulnerable, did not gentrify","max_chgba",1
+"170","Vulnerable, did not gentrify","sd_chgba",0.376621788577355
+"171","Vulnerable, did not gentrify","mean_chghhinc",0.395833333333333
+"172","Vulnerable, did not gentrify","min_chghhinc",0
+"173","Vulnerable, did not gentrify","max_chghhinc",1
+"174","Vulnerable, did not gentrify","sd_chghhinc",0.49420399497827
+"175","Vulnerable, did not gentrify","mean_chgnonhispwh",0.479166666666667
+"176","Vulnerable, did not gentrify","min_chgnonhispwh",0
+"177","Vulnerable, did not gentrify","max_chgnonhispwh",1
+"178","Vulnerable, did not gentrify","sd_chgnonhispwh",0.504852341308647
+"179","Vulnerable, did not gentrify","mean_chgmedrent",0.416666666666667
+"180","Vulnerable, did not gentrify","min_chgmedrent",0
+"181","Vulnerable, did not gentrify","max_chgmedrent",1
+"182","Vulnerable, did not gentrify","sd_chgmedrent",0.498223795452014
+"183","Vulnerable, did not gentrify","mean_chgmedhome",0.375
+"184","Vulnerable, did not gentrify","min_chgmedhome",0
+"185","Vulnerable, did not gentrify","max_chgmedhome",1
+"186","Vulnerable, did not gentrify","sd_chgmedhome",0.489246054790082
+"187","Vulnerable, gentrified","count",50
+"188","Vulnerable, gentrified","mean_hhinc12",90375.9862874074
+"189","Vulnerable, gentrified","min_hinc12",35475.5988148148
+"190","Vulnerable, gentrified","max_hhinc12",122444.888888889
+"191","Vulnerable, gentrified","sd_hhinc12",19344.2626893721
+"192","Vulnerable, gentrified","mean_hhinc18",98447.96
+"193","Vulnerable, gentrified","min_hhinc18",42382
+"194","Vulnerable, gentrified","max_hhinc18",140250
+"195","Vulnerable, gentrified","sd_hhinc18",20441.7666095868
+"196","Vulnerable, gentrified","mean_noba12",55.3784886993942
+"197","Vulnerable, gentrified","min_noba12",20.3321364452424
+"198","Vulnerable, gentrified","max_noba12",86.8520859671302
+"199","Vulnerable, gentrified","sd_noba12",12.9797458863581
+"200","Vulnerable, gentrified","mean_noba18",48.6186961067194
+"201","Vulnerable, gentrified","min_noba18",14.6495071193866
+"202","Vulnerable, gentrified","max_noba18",81.4698492462311
+"203","Vulnerable, gentrified","sd_noba18",14.6274078865631
+"204","Vulnerable, gentrified","mean_nonwhite12",48.8628311091878
+"205","Vulnerable, gentrified","min_nonwhite12",29.4867549668874
+"206","Vulnerable, gentrified","max_nonwhite12",71.6747610841297
+"207","Vulnerable, gentrified","sd_nonwhite12",10.7181397300189
+"208","Vulnerable, gentrified","mean_nonwhite18",45.8531065150755
+"209","Vulnerable, gentrified","min_nonwhite18",27.8821362799263
+"210","Vulnerable, gentrified","max_nonwhite18",68.4860120680197
+"211","Vulnerable, gentrified","sd_nonwhite18",9.31277908847121
+"212","Vulnerable, gentrified","mean_renters12",46.1707635069287
+"213","Vulnerable, gentrified","min_renters12",5.78512396694215
+"214","Vulnerable, gentrified","max_renters12",90.4387688277669
+"215","Vulnerable, gentrified","sd_renters12",20.9830178315933
+"216","Vulnerable, gentrified","mean_renters18",47.2651918634563
+"217","Vulnerable, gentrified","min_renters18",6.28997867803838
+"218","Vulnerable, gentrified","max_renters18",87.0562770562771
+"219","Vulnerable, gentrified","sd_renters18",22.4803147880779
+"220","Vulnerable, gentrified","mean_withba12",44.6215113006058
+"221","Vulnerable, gentrified","min_withba12",13.1479140328698
+"222","Vulnerable, gentrified","max_withba12",79.6678635547576
+"223","Vulnerable, gentrified","sd_withba12",12.9797458863581
+"224","Vulnerable, gentrified","mean_withba18",51.3813038932806
+"225","Vulnerable, gentrified","min_withba18",18.5301507537688
+"226","Vulnerable, gentrified","max_withba18",85.3504928806134
+"227","Vulnerable, gentrified","sd_withba18",14.6274078865631
+"228","Vulnerable, gentrified","mean_medinc12",90375.9862874074
+"229","Vulnerable, gentrified","min_medinc12",35475.5988148148
+"230","Vulnerable, gentrified","max_medinc12",122444.888888889
+"231","Vulnerable, gentrified","sd_medinc12",19344.2626893721
+"232","Vulnerable, gentrified","mean_medinc18",98447.96
+"233","Vulnerable, gentrified","min_medinc18",42382
+"234","Vulnerable, gentrified","max_medinc18",140250
+"235","Vulnerable, gentrified","sd_medinc18",20441.7666095868
+"236","Vulnerable, gentrified","mean_nonhispwh12",38.4493091502145
+"237","Vulnerable, gentrified","min_nonhispwh12",15.2707361589941
+"238","Vulnerable, gentrified","max_nonhispwh12",64.1721854304636
+"239","Vulnerable, gentrified","sd_nonhispwh12",11.7769200590847
+"240","Vulnerable, gentrified","mean_nonhispwh18",38.9220752970002
+"241","Vulnerable, gentrified","min_nonhispwh18",12.1041286685458
+"242","Vulnerable, gentrified","max_nonhispwh18",64.8250460405157
+"243","Vulnerable, gentrified","sd_nonhispwh18",12.0409427546814
+"244","Vulnerable, gentrified","mean_medrent12",1662.09486222222
+"245","Vulnerable, gentrified","min_medrent12",667.283555555556
+"246","Vulnerable, gentrified","max_medrent12",2192.50311111111
+"247","Vulnerable, gentrified","sd_medrent12",284.007535316824
+"248","Vulnerable, gentrified","mean_medrent18",1838.62
+"249","Vulnerable, gentrified","min_medrent18",672
+"250","Vulnerable, gentrified","max_medrent18",2704
+"251","Vulnerable, gentrified","sd_medrent18",346.571363208097
+"252","Vulnerable, gentrified","mean_medhome12",405962.605037037
+"253","Vulnerable, gentrified","min_medhome12",243794.074074074
+"254","Vulnerable, gentrified","max_medhome12",564616.118518519
+"255","Vulnerable, gentrified","sd_medhome12",74647.0063664792
+"256","Vulnerable, gentrified","mean_medhome18",458172
+"257","Vulnerable, gentrified","min_medhome18",274200
+"258","Vulnerable, gentrified","max_medhome18",665700
+"259","Vulnerable, gentrified","sd_medhome18",79232.0205317965
+"260","Vulnerable, gentrified","mean_chgba",0.86
+"261","Vulnerable, gentrified","min_chgba",0
+"262","Vulnerable, gentrified","max_chgba",1
+"263","Vulnerable, gentrified","sd_chgba",0.350509832753865
+"264","Vulnerable, gentrified","mean_chghhinc",0.7
+"265","Vulnerable, gentrified","min_chghhinc",0
+"266","Vulnerable, gentrified","max_chghhinc",1
+"267","Vulnerable, gentrified","sd_chghhinc",0.462910049886276
+"268","Vulnerable, gentrified","mean_chgnonhispwh",0.74
+"269","Vulnerable, gentrified","min_chgnonhispwh",0
+"270","Vulnerable, gentrified","max_chgnonhispwh",1
+"271","Vulnerable, gentrified","sd_chgnonhispwh",0.443087497693452
+"272","Vulnerable, gentrified","mean_chgmedrent",0.64
+"273","Vulnerable, gentrified","min_chgmedrent",0
+"274","Vulnerable, gentrified","max_chgmedrent",1
+"275","Vulnerable, gentrified","sd_chgmedrent",0.484873221385061
+"276","Vulnerable, gentrified","mean_chgmedhome",0.84
+"277","Vulnerable, gentrified","min_chgmedhome",0
+"278","Vulnerable, gentrified","max_chgmedhome",1
+"279","Vulnerable, gentrified","sd_chgmedhome",0.37032803990902
