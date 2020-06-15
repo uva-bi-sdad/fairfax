@@ -83,14 +83,14 @@ cpairs(cormatdata, order.single(cormat), dmat.color(cormat))
 #
 
 # Create trials variable (why 10? should be just 1 trial per tract)
-modeltrials <- rep(1, nrow(cormatdata))
+modeltrials <- rep(1, nrow(rundata@data))
 
 # Create outcome variable
 rundata@data <- rundata@data %>% mutate(c1_notvul = ifelse(type1218 == "Not vulnerable", 1, 0),
                                         c2_vulnotg = ifelse(type1218 == "Vulnerable, did not gentrify", 1, 0),
                                         c3_vulg = ifelse(type1218 == "Vulnerable, gentrified", 1, 0))
 
-rundata@data$c4_vul = rundata@data$c2_vulnotg + rundata@data$c3_vulg
+rundata@data$c4_vul <- rundata@data$c2_vulnotg + rundata@data$c3_vulg
 # binomial outcomes: c3_vulg, c4_vul
 
 # Model
@@ -100,119 +100,104 @@ rundata@data$c4_vul = rundata@data$c2_vulnotg + rundata@data$c3_vulg
 # NOTE: with a binomial outcome we can use MALA=TRUE and get potentially much faster mixing (Langevin updates)
 # the MCMC does do adaptive tuning as it runs, so no need to estimate the proposal s.d.
 
-#data2 <- rundata@data %>% dplyr::select(tct_diffhou12,tct_newbuild18,tct_multunit12,tct_transit12,
-#                                        chg1218_tct_renters,chg1218_tct_medhome_pct,chg1218_tct_medrent_pct,
-#                                        chg1218_tct_singfam,chg1218_tct_popgrowth,chg1218_tct_housdens
-#)
-##cpairs(data2)
-#cov.mean <- apply(data2,2,mean)
-#cov.sd <- apply(data2,2,sd)
-#for(j in 1:ncol(data2)){
-#  data2[,j] <- (data2[,j]-cov.mean[j])/cov.sd[j]
-#}
+# Set seed
+set.seed(76978)
 
-# try again with normalized betas (mean 0, sd 1)
-#chain2.norm <- MVS.CARleroux(formula = as.matrix(rundata@data[ , c("c2_vulnotg", "c1_notvul", "c3_vulg")]) ~ 
-#                          tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-#                          chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-#                          chg1218_tct_popgrowth + chg1218_tct_housdens,
-#                        data = data2,
-#                        family = "multinomial", W = W, burnin = 1e5, n.sample = 2.1e6, thin = 500, trials = modeltrials)
-
-# Outcome = Gentrified
+# Outcome = Vulnerable and gentrified
 chain1.binG <- S.CARleroux(formula = c3_vulg ~ 
-                            tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                            chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                            chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                            tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                            chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
+                             data = rundata@data,
+                             MALA = TRUE,
+                             family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain2.binG <- S.CARleroux(formula = c3_vulg ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
+                           data = rundata@data,
+                           MALA = TRUE,
+                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain3.binG <- S.CARleroux(formula = c3_vulg ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
+                           data = rundata@data,
+                           MALA = TRUE,
+                           family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
-# Outcome = vulnerable
-chain1.binV <- S.CARleroux(formula = c4_vul ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
-
-chain2.binV <- S.CARleroux(formula = c4_vul ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
-
-chain3.binV <- S.CARleroux(formula = c4_vul ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
-                          data = rundata@data,
-                          MALA = TRUE,
-                          family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
-
-# Outcome = vulnerable not gentrified
+# Outcome = Vulnerable but not gentrified
 chain1.binVng <- S.CARleroux(formula = c2_vulnotg ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
                            data = rundata@data,
                            MALA = TRUE,
                            family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain2.binVng <- S.CARleroux(formula = c2_vulnotg ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
                            data = rundata@data,
                            MALA = TRUE,
                            family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
 chain3.binVng <- S.CARleroux(formula = c2_vulnotg ~ 
-                             tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                             chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                             chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                             tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                             chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct, 
+                             chg1218_tct_multunit + chg1218_tct_vacant +  tct_newbuild18 + 
+                             chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                             chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                             chg1218_tct_housdens + 
+                             chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                             chg1218_tct_transit + 
+                             chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                             chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                             chg1218_tct_popgrowth,
                            data = rundata@data,
                            MALA = TRUE,
                            family = "binomial", W = W, burnin = 1e4, n.sample = 2.1e5, thin = 100, trials = modeltrials)
 
-# save.image("~/git/fairfax/src/gentri/mcmcoutBinomial.RData")
+# Save models
+saveRDS(chain1.binG, file = "./rivanna_data/working/paper/chain1.binG.Rds")
+saveRDS(chain2.binG, file = "./rivanna_data/working/paper/chain2.binG.Rds")
+saveRDS(chain3.binG, file = "./rivanna_data/working/paper/chain3.binG.Rds")
+
+saveRDS(chain1.binVng, file = "./rivanna_data/working/paper/chain1.binVng.Rds")
+saveRDS(chain2.binVng, file = "./rivanna_data/working/paper/chain2.binVng.Rds")
+saveRDS(chain3.binVng, file = "./rivanna_data/working/paper/chain3.binVng.Rds")
+
 
 # Output:
 # (i) posterior median (Median); 
@@ -227,17 +212,17 @@ print(chain1.binVng)
 print(chain2.binVng)
 print(chain3.binVng)
 
-# Combine results: Vulnerable gentrified
-beta.samples.matrix <- rbind(chain1.binG$samples$beta, chain1.binG$samples$beta, chain1.binG$samples$beta)
-colnames(beta.samples.matrix) <- colnames(chain1.binG$X)
+# Combine results: Vulnerable and gentrified
+beta.samples.matrixG <- rbind(chain1.binG$samples$beta, chain1.binG$samples$beta, chain1.binG$samples$beta)
+colnames(beta.samples.matrixG) <- colnames(chain1.binG$X)
 # Then posterior medians and 95% credible intervals can be computed as follows:
-round(t(apply(beta.samples.matrix, 2, quantile, c(0.5, 0.025, 0.975))),5)
+round(t(apply(beta.samples.matrixG, 2, quantile, c(0.5, 0.025, 0.975))),5)
 
-# Combine results: Vulnerable not gentrified
-beta.samples.matrix <- rbind(chain1.binVng$samples$beta, chain1.binVng$samples$beta, chain1.binVng$samples$beta)
-colnames(beta.samples.matrix) <- colnames(chain1.binVng$X)
-# Then posterior medians and 95% credible intervals can be computesd as follows:
-round(t(apply(beta.samples.matrix, 2, quantile, c(0.5, 0.025, 0.975))),5)
+# Combine results: Vulnerable but not gentrified
+beta.samples.matrixVng <- rbind(chain1.binVng$samples$beta, chain1.binVng$samples$beta, chain1.binVng$samples$beta)
+colnames(beta.samples.matrixVng) <- colnames(chain1.binVng$X)
+# Then posterior medians and 95% credible intervals can be computed as follows:
+round(t(apply(beta.samples.matrixVng, 2, quantile, c(0.5, 0.025, 0.975))),5)
 
 
 # 
@@ -257,25 +242,32 @@ chain1.binG$modelfit
 chain2.binG$modelfit
 chain3.binG$modelfit
 
+chain1.binVng$modelfit
+chain2.binVng$modelfit
+chain3.binVng$modelfit
+
 # Assess MCMC sample convergence
 beta.samplesG <- mcmc.list(chain1.binG$samples$beta, chain2.binG$samples$beta, chain3.binG$samples$beta)
-beta.samplesV <- mcmc.list(chain1.binV$samples$beta, chain2.binV$samples$beta, chain3.binV$samples$beta)
-# 2000 x 11 (intercept + 10 variables)
+beta.samplesVng <- mcmc.list(chain1.binVng$samples$beta, chain2.binVng$samples$beta, chain3.binVng$samples$beta)
+# 2000 x 19 (intercept + 18 variables)
 
 #plot(chain1$samples$beta[,13],type="l")
 
 # plots of posterior distribution for each of the three chains
-plot(beta.samplesG[,10])
-plot(beta.samplesV[,10])
+plot(beta.samplesG[,18])
+plot(beta.samplesVng[,18])
 
 library(coda)
 beta.samplesGall <- mcmc(rbind(chain1.binG$samples$beta, chain2.binG$samples$beta, chain3.binG$samples$beta))
-beta.samplesVall <- mcmc(rbind(chain1.binV$samples$beta, chain2.binV$samples$beta, chain3.binV$samples$beta))
+beta.samplesVall <- mcmc(rbind(chain1.binVng$samples$beta, chain2.binVng$samples$beta, chain3.binVng$samples$beta))
 HPDinterval(beta.samplesGall)
 HPDinterval(beta.samplesVall)
 
-#rho.samples <- mcmc.list(chain1.bin$samples$rho, chain2.bin$samples$rho, chain3.bin$samples$rho)
-#plot(rho.samples[,1]) # values >0 show the best fit has a significant spatial correlation
+# Rho
+rho.samplesG <- mcmc.list(chain1.binG$samples$rho, chain2.binG$samples$rho, chain3.binG$samples$rho)
+rho.samplesVng <- mcmc.list(chain1.binVng$samples$rho, chain2.binVng$samples$rho, chain3.binVng$samples$rho)
+plot(rho.samplesG[, 1]) # values >0 show the best fit has a significant spatial correlation
+plot(rho.samplesVng[, 1])
 
 # Potential scale reduction factor
 # Total value less than 1.1 is suggestive of convergence.
@@ -285,6 +277,9 @@ HPDinterval(beta.samplesVall)
 # The gelman plot shows  the development of the scale-reduction over time (chain steps).
 gelman.diag(beta.samplesG)
 gelman.plot(beta.samplesG) #these should not be going back up
+
+gelman.diag(beta.samplesVng)
+gelman.plot(beta.samplesVng)
 
 
 
@@ -312,11 +307,11 @@ confint(chain3.binG.nonspatial)
 data.frame( coef(chain3.binG.nonspatial) )
 
 chain3.binV.nonspatial <- glm(formula = c4_vul ~ 
-                             tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                             chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                             chg1218_tct_popgrowth + chg1218_tct_housdens,
-                           data = rundata@data,
-                           family = "binomial")
+                                tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
+                                chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
+                                chg1218_tct_popgrowth + chg1218_tct_housdens,
+                              data = rundata@data,
+                              family = "binomial")
 confint(chain3.binV.nonspatial)
 data.frame( coef(chain3.binV.nonspatial) )
 
@@ -345,11 +340,11 @@ library(pROC)
 
 pdf("~/git/fairfax/src/gentri/auc.pdf",width=8,height=4)
 par(mfrow=c(1,2))
-plot( roc(response=rundata@data$c3_vulg, predictor=chain1.binG$fitted.values), main="Outcome:Gentrify" )
-text(x=0.4,y=0.4,labels="AUC=0.83")
+plot( roc(response = rundata@data$c3_vulg, predictor = chain1.binG$fitted.values), main = "Outcome: Vulnerable and gentrified" )
+text(x = 0.4, y = 0.4,labels="AUC = 0.88")
 
-plot( roc(response=rundata@data$c4_vul, predictor=chain1.binV$fitted.values), main="Outcome:Vulnerable or Gentrify" )
-text(x=0.4,y=0.4,labels="AUC=0.84")
+plot( roc(response = rundata@data$c2_vulnotg, predictor = chain1.binVng$fitted.values), main = "Outcome: Vulnerable but not gentrified" )
+text(x = 0.4, y = 0.4, labels = "AUC = 0.82")
 dev.off()
 
 
@@ -364,20 +359,6 @@ chain1.binG$fitted.values # model estimated probability of each tract to gentrif
 
 # Run non-spatial
 predmodel <- glm(formula = c3_vulg ~ 
-                                tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                                chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                                chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                                tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                                chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
-                              data = rundata@data,
-                              family = "binomial")
-confint(predmodel)
-data.frame( coef(predmodel) )
-
-# Create new DF holding constant and manipulating key var
-
-
-predmodelV <- glm(formula = c4_vul ~ 
                    tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
                    chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
                    chg1218_tct_housdens + chg1218_tct_popgrowth + 
@@ -385,6 +366,20 @@ predmodelV <- glm(formula = c4_vul ~
                    chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
                  data = rundata@data,
                  family = "binomial")
+confint(predmodel)
+data.frame( coef(predmodel) )
+
+# Create new DF holding constant and manipulating key var
+
+
+predmodelV <- glm(formula = c4_vul ~ 
+                    tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
+                    chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
+                    chg1218_tct_housdens + chg1218_tct_popgrowth + 
+                    tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
+                    chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
+                  data = rundata@data,
+                  family = "binomial")
 confint(predmodelV)
 data.frame( coef(predmodelV) )
 
@@ -541,7 +536,7 @@ newdata_houseprice <- with(rundata@data,
                                       chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
                                       chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
                                       chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
-      ))
+                           ))
 
 newdata_houseprice$housepriceP <- predict(predmodel, newdata = newdata_houseprice, type = "response")
 
@@ -549,7 +544,7 @@ newdata_houseprice$housepriceP <- predict(predmodel, newdata = newdata_housepric
 
 # Get SE
 newdata_houseprice <- cbind(newdata_houseprice, predict(predmodel, newdata = newdata_houseprice, type = "link",
-                                    se = TRUE))
+                                                        se = TRUE))
 newdata_houseprice <- within(newdata_houseprice, {
   PredictedProb <- plogis(fit)
   LL <- plogis(fit - (1.96 * se.fit))
@@ -565,38 +560,38 @@ ggplot(newdata_houseprice, aes(x = chg1218_tct_medhome_pct, y = PredictedProb)) 
   geom_line(size = 1) +
   scale_x_continuous(breaks = seq(0, 80, 10), limits = c(0, 80)) +
   scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))
-  
+
 
 #
 # Model predictions: Unemployment ------------------------------------------------------
 #
 
 newdata_unempl <- with(rundata@data, 
-                           data.frame(tct_multunit12 = mean(tct_multunit12),
-                                      tct_vacant12 = mean(tct_vacant12),
-                                      tct_newbuild18 = mean(tct_newbuild18),
-                                      chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                      chg1218_tct_renters = mean(chg1218_tct_renters),
-                                      chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
-                                      chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
-                                      chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                      chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                      tct_rentburd12 = mean(tct_rentburd12), 
-                                      tct_diffhou12 = mean(tct_diffhou12), 
-                                      tct_transit12 = mean(tct_transit12),
-                                      tct_unemp12 = seq(0, 15, by = 5),
-                                      tct_inpov12 = mean(tct_inpov12),
-                                      chg1218_tct_withba = mean(chg1218_tct_withba),
-                                      chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
-                                      chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                      chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
-                           ))
+                       data.frame(tct_multunit12 = mean(tct_multunit12),
+                                  tct_vacant12 = mean(tct_vacant12),
+                                  tct_newbuild18 = mean(tct_newbuild18),
+                                  chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                  chg1218_tct_renters = mean(chg1218_tct_renters),
+                                  chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                  chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                  chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                  tct_rentburd12 = mean(tct_rentburd12), 
+                                  tct_diffhou12 = mean(tct_diffhou12), 
+                                  tct_transit12 = mean(tct_transit12),
+                                  tct_unemp12 = seq(0, 15, by = 5),
+                                  tct_inpov12 = mean(tct_inpov12),
+                                  chg1218_tct_withba = mean(chg1218_tct_withba),
+                                  chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                       ))
 
 newdata_unempl$unemplP <- predict(predmodel, newdata = newdata_unempl, type = "response")
 
 # Get SE
 newdata_unempl <- cbind(newdata_unempl, predict(predmodel, newdata = newdata_unempl, type = "link",
-                                                        se = TRUE))
+                                                se = TRUE))
 newdata_unempl <- within(newdata_unempl, {
   PredictedProb <- plogis(fit)
   LL <- plogis(fit - (1.96 * se.fit))
@@ -666,31 +661,31 @@ ggplot(newdata_withba, aes(x = chg1218_tct_withba, y = PredictedProb)) +
 #
 
 newdata_nonhispw <- with(rundata@data, 
-                       data.frame(tct_multunit12 = mean(tct_multunit12),
-                                  tct_vacant12 = mean(tct_vacant12),
-                                  tct_newbuild18 = mean(tct_newbuild18),
-                                  chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                  chg1218_tct_renters = mean(chg1218_tct_renters),
-                                  chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
-                                  chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
-                                  chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                  tct_rentburd12 = mean(tct_rentburd12), 
-                                  tct_diffhou12 = mean(tct_diffhou12), 
-                                  tct_transit12 = mean(tct_transit12),
-                                  tct_unemp12 = mean(tct_unemp12),
-                                  tct_inpov12 = mean(tct_inpov12),
-                                  chg1218_tct_withba = mean(chg1218_tct_withba),
-                                  chg1218_tct_nonhispwh = seq(0, 20, by = 5),
-                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
-                       ))
+                         data.frame(tct_multunit12 = mean(tct_multunit12),
+                                    tct_vacant12 = mean(tct_vacant12),
+                                    tct_newbuild18 = mean(tct_newbuild18),
+                                    chg1218_tct_singfam = mean(chg1218_tct_singfam),
+                                    chg1218_tct_renters = mean(chg1218_tct_renters),
+                                    chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                    chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
+                                    chg1218_tct_housdens = mean(chg1218_tct_housdens),
+                                    chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
+                                    tct_rentburd12 = mean(tct_rentburd12), 
+                                    tct_diffhou12 = mean(tct_diffhou12), 
+                                    tct_transit12 = mean(tct_transit12),
+                                    tct_unemp12 = mean(tct_unemp12),
+                                    tct_inpov12 = mean(tct_inpov12),
+                                    chg1218_tct_withba = mean(chg1218_tct_withba),
+                                    chg1218_tct_nonhispwh = seq(0, 20, by = 5),
+                                    chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
+                                    chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                         ))
 
 newdata_nonhispw$nonhispP <- predict(predmodel, newdata = newdata_nonhispw, type = "response")
 
 # Get SE
 newdata_nonhispw <- cbind(newdata_nonhispw, predict(predmodel, newdata = newdata_nonhispw, type = "link",
-                                                se = TRUE))
+                                                    se = TRUE))
 newdata_nonhispw <- within(newdata_nonhispw, {
   PredictedProb <- plogis(fit)
   LL <- plogis(fit - (1.96 * se.fit))

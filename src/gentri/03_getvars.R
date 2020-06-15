@@ -133,8 +133,15 @@ acsdata12 <- acsdata12 %>% mutate(
     ) %>% select("STATEFP", "COUNTYFP", "TRACTCE", "GEOID", starts_with("tct")) %>% st_set_geometry(NULL)
 
 acsdata18 <- acsdata18 %>% mutate(
+  tct_unemp18 = B23025_005E / B23025_002E * 100, # pct unemployed, unemployed / in labor force
+  tct_inpov18 = B06012_002E / B06012_001E * 100, # pct below poverty, <100% poverty line / total  
+  tct_multunit18 = (B25024_006E + B25024_007E + B25024_008E + B25024_009E) / B25024_001E * 100, # 5+ units in structure, (5 to 50+) / total
+  tct_diffhou18 = (B07003_007E + B07003_010E + B07003_013E + B07003_016E) / B07003_001E * 100, # different house than 1yr ago , (all movers) / total      
   tct_singfam18 = (B25024_002E + B25024_003E) / B25024_001E * 100, # pct single family units, (attached+detached) / total 
+  tct_vacant18 = B25002_003E / B25002_001E * 100, # pct vacant, vacant / total 
+  tct_rentburd18 = (B25070_008E + B25070_009E + B25070_010E) / B25070_001E * 100, # pct rent burdened, 35%+ of income in rent / total 
   tct_nonfam18 = B11001_007E / B11001_001E * 100, # pct nonfamily hhs,      
+  tct_transit18 = B08101_025E / B08101_001E * 100, # pct workers taking transit, public transport / total
   tct_popdens18 = B03002_001E / (ALAND / 1000000), # people per land area (in square km)
   tct_housdens18 = B25024_001E / (ALAND / 1000000), # buildings per land area (in square km)
   tct_newbuild18 = (B25034_002E + B25034_003E) / B25034_001E * 100, # built since 2010, since 2010 / total
@@ -152,7 +159,14 @@ ffx_covars <- full_join(acsdata12, acsdata18, by = c("STATEFP", "COUNTYFP", "TRA
 
 # Calculate remaining
 ffx_covars <- ffx_covars %>% mutate(
+  chg1218_tct_inpov = tct_inpov18 - tct_inpov12,
+  chg1218_tct_unemp = tct_unemp18 - tct_unemp12,
+  chg1218_tct_multunit = tct_multunit18 - tct_multunit12,
   chg1218_tct_singfam = tct_singfam18 - tct_singfam12,
+  chg1218_tct_diffhou = tct_diffhou18 - tct_diffhou12,
+  chg1218_tct_vacant = tct_vacant18 - tct_vacant12,
+  chg1218_tct_transit = tct_transit18 - tct_transit12,
+  chg1218_tct_rentburd = tct_rentburd18 - tct_rentburd12,
   chg1218_tct_nonfam = tct_nonfam18 - tct_nonfam12,
   chg1218_tct_popdens = (tct_popdens18 * 100 / tct_popdens12) - 100,
   chg1218_tct_housdens = (tct_housdens18 * 100 / tct_housdens12) - 100,
