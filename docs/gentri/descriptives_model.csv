@@ -1,0 +1,220 @@
+"","type1218","name","value"
+"1","Not vulnerable","count",151
+"2","Not vulnerable","mean_chg1218_tct_multunit",0.282816568995085
+"3","Not vulnerable","min_chg1218_tct_multunit",-10.8183079056865
+"4","Not vulnerable","max_chg1218_tct_multunit",16.3936243985819
+"5","Not vulnerable","sd_chg1218_tct_multunit",3.91519974639407
+"6","Not vulnerable","mean_chg1218_tct_vacant",0.0414163613854451
+"7","Not vulnerable","min_chg1218_tct_vacant",-12.4810606060606
+"8","Not vulnerable","max_chg1218_tct_vacant",12.3052959501558
+"9","Not vulnerable","sd_chg1218_tct_vacant",3.29838642285093
+"10","Not vulnerable","mean_tct_newbuild18",2.07929183986733
+"11","Not vulnerable","min_tct_newbuild18",0
+"12","Not vulnerable","max_tct_newbuild18",16.739203213927
+"13","Not vulnerable","sd_tct_newbuild18",3.43343393094243
+"14","Not vulnerable","mean_chg1218_tct_singfam",-0.399746174128069
+"15","Not vulnerable","min_chg1218_tct_singfam",-16.1069904449503
+"16","Not vulnerable","max_chg1218_tct_singfam",11.9868550887303
+"17","Not vulnerable","sd_chg1218_tct_singfam",4.02053283010241
+"18","Not vulnerable","mean_chg1218_tct_medhome_pct",2.65894617796693
+"19","Not vulnerable","min_chg1218_tct_medhome_pct",-23.5089476593638
+"20","Not vulnerable","max_chg1218_tct_medhome_pct",31.8055739813378
+"21","Not vulnerable","sd_chg1218_tct_medhome_pct",8.17621263230765
+"22","Not vulnerable","mean_chg1218_tct_renters",0.281319926168256
+"23","Not vulnerable","min_chg1218_tct_renters",-17.5967091130887
+"24","Not vulnerable","max_chg1218_tct_renters",13.2130566588116
+"25","Not vulnerable","sd_chg1218_tct_renters",5.64261066574614
+"26","Not vulnerable","mean_chg1218_tct_medrent_pct",18.9706965700485
+"27","Not vulnerable","min_chg1218_tct_medrent_pct",-44.5838870721481
+"28","Not vulnerable","max_chg1218_tct_medrent_pct",281.93771237895
+"29","Not vulnerable","sd_chg1218_tct_medrent_pct",32.1798251688207
+"30","Not vulnerable","mean_chg1218_tct_housdens",-0.276706502201184
+"31","Not vulnerable","min_chg1218_tct_housdens",-10.0086703232083
+"32","Not vulnerable","max_chg1218_tct_housdens",24.2568381452564
+"33","Not vulnerable","sd_chg1218_tct_housdens",4.34957799152829
+"34","Not vulnerable","mean_chg1218_tct_rentburd",-1.21480368844141
+"35","Not vulnerable","min_chg1218_tct_rentburd",-100
+"36","Not vulnerable","max_chg1218_tct_rentburd",100
+"37","Not vulnerable","sd_chg1218_tct_rentburd",25.1981331880902
+"38","Not vulnerable","mean_chg1218_tct_diffhou",0.140517163288586
+"39","Not vulnerable","min_chg1218_tct_diffhou",-22.2480973281187
+"40","Not vulnerable","max_chg1218_tct_diffhou",13.2226522493774
+"41","Not vulnerable","sd_chg1218_tct_diffhou",5.23497524885254
+"42","Not vulnerable","mean_chg1218_tct_transit",0.768850179730651
+"43","Not vulnerable","min_chg1218_tct_transit",-15.7232315210646
+"44","Not vulnerable","max_chg1218_tct_transit",16.8444816269853
+"45","Not vulnerable","sd_chg1218_tct_transit",3.80765607590225
+"46","Not vulnerable","mean_chg1218_tct_unemp",-0.528714661439054
+"47","Not vulnerable","min_chg1218_tct_unemp",-7.55846640087027
+"48","Not vulnerable","max_chg1218_tct_unemp",10.0098678691556
+"49","Not vulnerable","sd_chg1218_tct_unemp",2.70271117079638
+"50","Not vulnerable","mean_chg1218_tct_inpov",0.188824269021392
+"51","Not vulnerable","min_chg1218_tct_inpov",-19.7235185307908
+"52","Not vulnerable","max_chg1218_tct_inpov",9.32204411822223
+"53","Not vulnerable","sd_chg1218_tct_inpov",3.37144994927181
+"54","Not vulnerable","mean_chg1218_tct_hhinc_pct",1.50085015548633
+"55","Not vulnerable","min_chg1218_tct_hhinc_pct",-23.120993736495
+"56","Not vulnerable","max_chg1218_tct_hhinc_pct",54.3437007517426
+"57","Not vulnerable","sd_chg1218_tct_hhinc_pct",12.5218815985907
+"58","Not vulnerable","mean_chg1218_tct_nonfam",0.118365568230963
+"59","Not vulnerable","min_chg1218_tct_nonfam",-20.701359283052
+"60","Not vulnerable","max_chg1218_tct_nonfam",13.0053334255761
+"61","Not vulnerable","sd_chg1218_tct_nonfam",5.34777971056894
+"62","Not vulnerable","mean_chg1218_tct_withba",2.60571701776607
+"63","Not vulnerable","min_chg1218_tct_withba",-14.1108711303096
+"64","Not vulnerable","max_chg1218_tct_withba",16.3566723683881
+"65","Not vulnerable","sd_chg1218_tct_withba",5.87280731150781
+"66","Not vulnerable","mean_chg1218_tct_nonhispwh",-3.06241906634246
+"67","Not vulnerable","min_chg1218_tct_nonhispwh",-23.7810928856131
+"68","Not vulnerable","max_chg1218_tct_nonhispwh",17.9622726422498
+"69","Not vulnerable","sd_chg1218_tct_nonhispwh",6.98630041808638
+"70","Not vulnerable","mean_chg1218_tct_popgrowth",3.1268997744789
+"71","Not vulnerable","min_chg1218_tct_popgrowth",-16.8840579710145
+"72","Not vulnerable","max_chg1218_tct_popgrowth",34.061135371179
+"73","Not vulnerable","sd_chg1218_tct_popgrowth",8.96596421781753
+"74","Vulnerable, did not gentrify","count",48
+"75","Vulnerable, did not gentrify","mean_chg1218_tct_multunit",0.896911646014472
+"76","Vulnerable, did not gentrify","min_chg1218_tct_multunit",-9.57837726393251
+"77","Vulnerable, did not gentrify","max_chg1218_tct_multunit",18.5712031693633
+"78","Vulnerable, did not gentrify","sd_chg1218_tct_multunit",6.41709545064209
+"79","Vulnerable, did not gentrify","mean_chg1218_tct_vacant",-0.516316835272459
+"80","Vulnerable, did not gentrify","min_chg1218_tct_vacant",-11.7472643018557
+"81","Vulnerable, did not gentrify","max_chg1218_tct_vacant",8.51375662762729
+"82","Vulnerable, did not gentrify","sd_chg1218_tct_vacant",4.89129268535811
+"83","Vulnerable, did not gentrify","mean_tct_newbuild18",2.83124595197283
+"84","Vulnerable, did not gentrify","min_tct_newbuild18",0
+"85","Vulnerable, did not gentrify","max_tct_newbuild18",31.3566936208446
+"86","Vulnerable, did not gentrify","sd_tct_newbuild18",6.36313097082569
+"87","Vulnerable, did not gentrify","mean_chg1218_tct_singfam",-1.17114601168034
+"88","Vulnerable, did not gentrify","min_chg1218_tct_singfam",-18.1538998586507
+"89","Vulnerable, did not gentrify","max_chg1218_tct_singfam",11.5972607979019
+"90","Vulnerable, did not gentrify","sd_chg1218_tct_singfam",6.19996434879496
+"91","Vulnerable, did not gentrify","mean_chg1218_tct_medhome_pct",0.0218791068811484
+"92","Vulnerable, did not gentrify","min_chg1218_tct_medhome_pct",-51.6561627355106
+"93","Vulnerable, did not gentrify","max_chg1218_tct_medhome_pct",24.5177322380086
+"94","Vulnerable, did not gentrify","sd_chg1218_tct_medhome_pct",12.8131326178878
+"95","Vulnerable, did not gentrify","mean_chg1218_tct_renters",2.1265377116654
+"96","Vulnerable, did not gentrify","min_chg1218_tct_renters",-12.9723997903324
+"97","Vulnerable, did not gentrify","max_chg1218_tct_renters",23.0967144012513
+"98","Vulnerable, did not gentrify","sd_chg1218_tct_renters",7.75382075986304
+"99","Vulnerable, did not gentrify","mean_chg1218_tct_medrent_pct",3.1780005502017
+"100","Vulnerable, did not gentrify","min_chg1218_tct_medrent_pct",-15.4044822609707
+"101","Vulnerable, did not gentrify","max_chg1218_tct_medrent_pct",22.6585195272381
+"102","Vulnerable, did not gentrify","sd_chg1218_tct_medrent_pct",8.30459322451194
+"103","Vulnerable, did not gentrify","mean_chg1218_tct_housdens",3.31237170944402
+"104","Vulnerable, did not gentrify","min_chg1218_tct_housdens",-8.97544511680309
+"105","Vulnerable, did not gentrify","max_chg1218_tct_housdens",62.8781234652209
+"106","Vulnerable, did not gentrify","sd_chg1218_tct_housdens",11.9072627775603
+"107","Vulnerable, did not gentrify","mean_chg1218_tct_rentburd",0.27586880759483
+"108","Vulnerable, did not gentrify","min_chg1218_tct_rentburd",-42.6374859708193
+"109","Vulnerable, did not gentrify","max_chg1218_tct_rentburd",26.7435742349811
+"110","Vulnerable, did not gentrify","sd_chg1218_tct_rentburd",14.4492805319169
+"111","Vulnerable, did not gentrify","mean_chg1218_tct_diffhou",0.238708057627972
+"112","Vulnerable, did not gentrify","min_chg1218_tct_diffhou",-14.6433624880824
+"113","Vulnerable, did not gentrify","max_chg1218_tct_diffhou",21.3716076390222
+"114","Vulnerable, did not gentrify","sd_chg1218_tct_diffhou",6.1299988189516
+"115","Vulnerable, did not gentrify","mean_chg1218_tct_transit",-0.724137322235193
+"116","Vulnerable, did not gentrify","min_chg1218_tct_transit",-18.3379093245478
+"117","Vulnerable, did not gentrify","max_chg1218_tct_transit",11.4389249397081
+"118","Vulnerable, did not gentrify","sd_chg1218_tct_transit",5.22988901980165
+"119","Vulnerable, did not gentrify","mean_chg1218_tct_unemp",-0.933299089577885
+"120","Vulnerable, did not gentrify","min_chg1218_tct_unemp",-10.0125767293517
+"121","Vulnerable, did not gentrify","max_chg1218_tct_unemp",5.17462099943852
+"122","Vulnerable, did not gentrify","sd_chg1218_tct_unemp",3.39772317958397
+"123","Vulnerable, did not gentrify","mean_chg1218_tct_inpov",1.06414634821595
+"124","Vulnerable, did not gentrify","min_chg1218_tct_inpov",-15.7836478725635
+"125","Vulnerable, did not gentrify","max_chg1218_tct_inpov",14.0671357130163
+"126","Vulnerable, did not gentrify","sd_chg1218_tct_inpov",6.5645737218447
+"127","Vulnerable, did not gentrify","mean_chg1218_tct_hhinc_pct",-1.68563413674504
+"128","Vulnerable, did not gentrify","min_chg1218_tct_hhinc_pct",-40.636407786548
+"129","Vulnerable, did not gentrify","max_chg1218_tct_hhinc_pct",42.2091482509496
+"130","Vulnerable, did not gentrify","sd_chg1218_tct_hhinc_pct",14.4256843685002
+"131","Vulnerable, did not gentrify","mean_chg1218_tct_nonfam",-1.72757960861432
+"132","Vulnerable, did not gentrify","min_chg1218_tct_nonfam",-16.4432396082882
+"133","Vulnerable, did not gentrify","max_chg1218_tct_nonfam",16.0760407336226
+"134","Vulnerable, did not gentrify","sd_chg1218_tct_nonfam",7.40249957347627
+"135","Vulnerable, did not gentrify","mean_chg1218_tct_withba",-0.248321765670732
+"136","Vulnerable, did not gentrify","min_chg1218_tct_withba",-11.4556755026156
+"137","Vulnerable, did not gentrify","max_chg1218_tct_withba",12.5024907631816
+"138","Vulnerable, did not gentrify","sd_chg1218_tct_withba",5.16011305524438
+"139","Vulnerable, did not gentrify","mean_chg1218_tct_nonhispwh",-4.24861260450921
+"140","Vulnerable, did not gentrify","min_chg1218_tct_nonhispwh",-28.605864905498
+"141","Vulnerable, did not gentrify","max_chg1218_tct_nonhispwh",11.8141803656195
+"142","Vulnerable, did not gentrify","sd_chg1218_tct_nonhispwh",8.93151038625034
+"143","Vulnerable, did not gentrify","mean_chg1218_tct_popgrowth",10.8098656986388
+"144","Vulnerable, did not gentrify","min_chg1218_tct_popgrowth",-17.2872996300863
+"145","Vulnerable, did not gentrify","max_chg1218_tct_popgrowth",43.6052225186017
+"146","Vulnerable, did not gentrify","sd_chg1218_tct_popgrowth",12.5962357064912
+"147","Vulnerable, gentrified","count",50
+"148","Vulnerable, gentrified","mean_chg1218_tct_multunit",-0.51507886898695
+"149","Vulnerable, gentrified","min_chg1218_tct_multunit",-14.4615945606748
+"150","Vulnerable, gentrified","max_chg1218_tct_multunit",14.2886167953446
+"151","Vulnerable, gentrified","sd_chg1218_tct_multunit",6.18455017314611
+"152","Vulnerable, gentrified","mean_chg1218_tct_vacant",-1.05149158590952
+"153","Vulnerable, gentrified","min_chg1218_tct_vacant",-13.3720064931143
+"154","Vulnerable, gentrified","max_chg1218_tct_vacant",9.56198564820181
+"155","Vulnerable, gentrified","sd_chg1218_tct_vacant",5.05773914422687
+"156","Vulnerable, gentrified","mean_tct_newbuild18",4.09849771293527
+"157","Vulnerable, gentrified","min_tct_newbuild18",0
+"158","Vulnerable, gentrified","max_tct_newbuild18",36.0795454545455
+"159","Vulnerable, gentrified","sd_tct_newbuild18",6.88701001457559
+"160","Vulnerable, gentrified","mean_chg1218_tct_singfam",0.377248996198844
+"161","Vulnerable, gentrified","min_chg1218_tct_singfam",-15.9934140413558
+"162","Vulnerable, gentrified","max_chg1218_tct_singfam",13.5362398413658
+"163","Vulnerable, gentrified","sd_chg1218_tct_singfam",5.78534324630137
+"164","Vulnerable, gentrified","mean_chg1218_tct_medhome_pct",14.5080163132713
+"165","Vulnerable, gentrified","min_chg1218_tct_medhome_pct",-16.0173237598267
+"166","Vulnerable, gentrified","max_chg1218_tct_medhome_pct",127.52808988764
+"167","Vulnerable, gentrified","sd_chg1218_tct_medhome_pct",20.6347649332999
+"168","Vulnerable, gentrified","mean_chg1218_tct_renters",1.09442835652754
+"169","Vulnerable, gentrified","min_chg1218_tct_renters",-13.937078400769
+"170","Vulnerable, gentrified","max_chg1218_tct_renters",15.769563664756
+"171","Vulnerable, gentrified","sd_chg1218_tct_renters",6.95429740382556
+"172","Vulnerable, gentrified","mean_chg1218_tct_medrent_pct",11.8789479196318
+"173","Vulnerable, gentrified","min_chg1218_tct_medrent_pct",-16.8658987176701
+"174","Vulnerable, gentrified","max_chg1218_tct_medrent_pct",149.372158762901
+"175","Vulnerable, gentrified","sd_chg1218_tct_medrent_pct",22.602039920141
+"176","Vulnerable, gentrified","mean_chg1218_tct_housdens",2.3204273095043
+"177","Vulnerable, gentrified","min_chg1218_tct_housdens",-9.14142698729745
+"178","Vulnerable, gentrified","max_chg1218_tct_housdens",82.0505480644883
+"179","Vulnerable, gentrified","sd_chg1218_tct_housdens",14.07495737276
+"180","Vulnerable, gentrified","mean_chg1218_tct_rentburd",-0.471176351943493
+"181","Vulnerable, gentrified","min_chg1218_tct_rentburd",-46.915624233505
+"182","Vulnerable, gentrified","max_chg1218_tct_rentburd",31.681450162909
+"183","Vulnerable, gentrified","sd_chg1218_tct_rentburd",14.774249342831
+"184","Vulnerable, gentrified","mean_chg1218_tct_diffhou",1.28814051818024
+"185","Vulnerable, gentrified","min_chg1218_tct_diffhou",-16.5351759853468
+"186","Vulnerable, gentrified","max_chg1218_tct_diffhou",18.497350684175
+"187","Vulnerable, gentrified","sd_chg1218_tct_diffhou",7.79009553774285
+"188","Vulnerable, gentrified","mean_chg1218_tct_transit",0.554582748607993
+"189","Vulnerable, gentrified","min_chg1218_tct_transit",-13.8931223826921
+"190","Vulnerable, gentrified","max_chg1218_tct_transit",13.243950884796
+"191","Vulnerable, gentrified","sd_chg1218_tct_transit",5.17984849205483
+"192","Vulnerable, gentrified","mean_chg1218_tct_unemp",-1.57675588842319
+"193","Vulnerable, gentrified","min_chg1218_tct_unemp",-11.2570935737202
+"194","Vulnerable, gentrified","max_chg1218_tct_unemp",5.57664702178595
+"195","Vulnerable, gentrified","sd_chg1218_tct_unemp",3.42438958031569
+"196","Vulnerable, gentrified","mean_chg1218_tct_inpov",-0.286496164201189
+"197","Vulnerable, gentrified","min_chg1218_tct_inpov",-17.1885639432604
+"198","Vulnerable, gentrified","max_chg1218_tct_inpov",14.8515128790474
+"199","Vulnerable, gentrified","sd_chg1218_tct_inpov",5.00807220500753
+"200","Vulnerable, gentrified","mean_chg1218_tct_hhinc_pct",10.6631613620257
+"201","Vulnerable, gentrified","min_chg1218_tct_hhinc_pct",-26.1998392528078
+"202","Vulnerable, gentrified","max_chg1218_tct_hhinc_pct",82.5733769416843
+"203","Vulnerable, gentrified","sd_chg1218_tct_hhinc_pct",18.4724689474536
+"204","Vulnerable, gentrified","mean_chg1218_tct_nonfam",-2.88026709070295
+"205","Vulnerable, gentrified","min_chg1218_tct_nonfam",-15.2659788390569
+"206","Vulnerable, gentrified","max_chg1218_tct_nonfam",12.9113825414451
+"207","Vulnerable, gentrified","sd_chg1218_tct_nonfam",6.35520112395742
+"208","Vulnerable, gentrified","mean_chg1218_tct_withba",6.7597925926748
+"209","Vulnerable, gentrified","min_chg1218_tct_withba",-13.210470337147
+"210","Vulnerable, gentrified","max_chg1218_tct_withba",24.5694408096895
+"211","Vulnerable, gentrified","sd_chg1218_tct_withba",6.60907701468771
+"212","Vulnerable, gentrified","mean_chg1218_tct_nonhispwh",0.472766146785687
+"213","Vulnerable, gentrified","min_chg1218_tct_nonhispwh",-17.7112523427668
+"214","Vulnerable, gentrified","max_chg1218_tct_nonhispwh",17.412667015899
+"215","Vulnerable, gentrified","sd_chg1218_tct_nonhispwh",7.11925298821601
+"216","Vulnerable, gentrified","mean_chg1218_tct_popgrowth",9.15685472094364
+"217","Vulnerable, gentrified","min_chg1218_tct_popgrowth",-13.2233676975945
+"218","Vulnerable, gentrified","max_chg1218_tct_popgrowth",69.4386694386695
+"219","Vulnerable, gentrified","sd_chg1218_tct_popgrowth",15.4825727684155
