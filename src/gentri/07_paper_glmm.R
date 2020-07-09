@@ -224,8 +224,23 @@ saveRDS(chain1.binVng, file = "./rivanna_data/working/paper/chain1.binVng.glmm.R
 saveRDS(chain2.binVng, file = "./rivanna_data/working/paper/chain2.binVng.glmm.Rds")
 saveRDS(chain3.binVng, file = "./rivanna_data/working/paper/chain3.binVng.glmm.Rds")
 
+#
+# Read in chains ----------------------------------------------------------------------
+#
 
-# Output:
+chain1.binG <- readRDS("./rivanna_data/working/paper/chain1.binG.glmm.Rds")
+chain2.binG <- readRDS("./rivanna_data/working/paper/chain2.binG.glmm.Rds")
+chain3.binG <- readRDS("./rivanna_data/working/paper/chain3.binG.glmm.Rds")
+
+chain1.binVng <- readRDS(file = "./rivanna_data/working/paper/chain1.binVng.glmm.Rds")
+chain2.binVng <- readRDS(file = "./rivanna_data/working/paper/chain2.binVng.glmm.Rds")
+chain3.binVng <- readRDS(file = "./rivanna_data/working/paper/chain3.binVng.glmm.Rds")
+
+
+#
+# Output ----------------------------------------------------------------------
+#
+
 # This function displays (1) the call to sparse.sglmm, (2) the values of the hyperparameters and
 # tuning parameters, (3) a table of estimates, (4) the DIC value for the fit, and (5) the number of
 # posterior samples. Each row of the table of estimates shows an estimated regression coefficient, the
@@ -342,26 +357,29 @@ plot(chain1.binG$residuals)
 plot(chain1.binG$gamma.mcse)
 
 # Assess MCMC sample convergence
-beta.samplesG <- mcmc.list(chain1.binG$beta.sample, chain2.binG$beta.sample, chain3.binG$beta.sample)
-beta.samplesVng <- mcmc.list(chain1.binVng$beta.sample, chain2.binVng$beta.sample, chain3.binVng$beta.sample)
+vgent1 <- mcmc(chain1.binG$beta.sample)
+vgent2 <- mcmc(chain2.binG$beta.sample)
+vgent3 <- mcmc(chain3.binG$beta.sample)
+  
+vngent1 <- mcmc(chain1.binG$beta.sample)
+vngent2 <- mcmc(chain2.binG$beta.sample)
+vngent3 <- mcmc(chain3.binG$beta.sample)
+
 # 2000 x 19 (intercept + 18 variables)
+beta.samplesG <- mcmc.list(vgent1, vgent2, vgent3)
+beta.samplesVng <- mcmc.list(vngent1, vngent2, vngent3)
 
-#plot(chain1$samples$beta[,13],type="l")
+# For an individual chain, by variable
+plot(chain1.binG$beta.sample[, 13], type = "l")
 
-# plots of posterior distribution for each of the three chains
-plot(beta.samplesG[,18])
-plot(beta.samplesVng[,18])
+# For posterior distribution of each of the three chains, by variable
+plot(beta.samplesG[, 15])
+plot(beta.samplesVng[, 18])
 
 beta.samplesGall <- mcmc(rbind(chain1.binG$beta.sample, chain2.binG$beta.sample, chain3.binG$beta.sample))
 beta.samplesVall <- mcmc(rbind(chain1.binVng$beta.sample, chain2.binVng$beta.sample, chain3.binVng$beta.sample))
 HPDinterval(beta.samplesGall)
 HPDinterval(beta.samplesVall)
-
-# Rho
-rho.samplesG <- mcmc.list(chain1.binG$samples$rho, chain2.binG$samples$rho, chain3.binG$samples$rho)
-rho.samplesVng <- mcmc.list(chain1.binVng$samples$rho, chain2.binVng$samples$rho, chain3.binVng$samples$rho)
-plot(rho.samplesG[, 1]) # values >0 show the best fit has a significant spatial correlation
-plot(rho.samplesVng[, 1])
 
 # Potential scale reduction factor
 # Total value less than 1.1 is suggestive of convergence.
