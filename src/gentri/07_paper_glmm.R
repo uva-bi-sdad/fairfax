@@ -394,54 +394,19 @@ gelman.diag(beta.samplesVng)
 gelman.plot(beta.samplesVng)
 
 
-
-#
-# Output ------------------------------------------------------------------------------------------
-#
-
-# trace plots of (beta.samples) for each of 10 variables (5x2) for the two models
-# posterior means + HPD credible intervals for each of the 10 variables for the two models (tables)
-
-# show ability to do model predictions under new covariates
-
-
-#
-# Compare to nonspatial models ------------------------------------------------------------------------------------------
-#
-
-chain3.binG.nonspatial <- glm(formula = c3_vulg ~ 
-                                tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                                chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                                chg1218_tct_popgrowth + chg1218_tct_housdens,
-                              data = rundata@data,
-                              family = "binomial")
-confint(chain3.binG.nonspatial)
-data.frame( coef(chain3.binG.nonspatial) )
-
-chain3.binV.nonspatial <- glm(formula = c4_vul ~ 
-                                tct_diffhou12 + tct_newbuild18 + tct_multunit12 + tct_transit12 + 
-                                chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + chg1218_tct_singfam + 
-                                chg1218_tct_popgrowth + chg1218_tct_housdens,
-                              data = rundata@data,
-                              family = "binomial")
-confint(chain3.binV.nonspatial)
-data.frame( coef(chain3.binV.nonspatial) )
-
-
 #
 # Trace plots ------------------------------------------------------------------------------------------
 #
 
-pdf("~/git/fairfax/src/gentri/trace_binG.pdf",height=6,width=4)
-par(mar=c(0,0,0,0))
-plot(beta.samplesG[,1:11])
+pdf("./output/gentri/trace_binG.pdf", height = 6, width = 4)
+par(mar = c(0,0,0,0))
+plot(beta.samplesG[, 1:18])
 dev.off()
 
-pdf("~/git/fairfax/src/gentri/trace_binV.pdf",height=6,width=4)
-par(mar=c(0,0,0,0))
-plot(beta.samplesV[,1:11])
+pdf("./output/gentri/trace_binV.pdf", height = 6 , width = 4)
+par(mar = c(0,0,0,0))
+plot(beta.samplesVng[, 1:18])
 dev.off()
-
 
 
 #
@@ -450,15 +415,49 @@ dev.off()
 
 library(pROC)
 
-pdf("~/git/fairfax/src/gentri/auc.pdf",width=8,height=4)
-par(mfrow=c(1,2))
+pdf("./output/gentri/auc.pdf", width = 8, height = 4)
+par(mfrow = c(1, 2))
 plot( roc(response = rundata@data$c3_vulg, predictor = chain1.binG$fitted.values), main = "Outcome: Vulnerable and gentrified" )
-text(x = 0.4, y = 0.4,labels="AUC = 0.88")
+text(x = 0.4, y = 0.4,labels = "AUC = 0.88")
 
 plot( roc(response = rundata@data$c2_vulnotg, predictor = chain1.binVng$fitted.values), main = "Outcome: Vulnerable but not gentrified" )
-text(x = 0.4, y = 0.4, labels = "AUC = 0.82")
+text(x = 0.4, y = 0.4, labels = "AUC = 0.88")
 dev.off()
 
+
+#
+# Compare to nonspatial models ------------------------------------------------------------------------------------------
+#
+
+chain3.binG.nonspatial <- glm(formula = c3_vulg ~ 
+                                chg1218_tct_multunit + chg1218_tct_vacant +
+                                chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                                chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                                chg1218_tct_housdens + 
+                                chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                                chg1218_tct_transit + 
+                                chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                                chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                                chg1218_tct_popgrowth,
+                              data = rundata@data,
+                              family = "binomial")
+confint(chain3.binG.nonspatial)
+data.frame( coef(chain3.binG.nonspatial) )
+
+chain3.binV.nonspatial <- glm(formula = c2_vulnotg ~ 
+                                chg1218_tct_multunit + chg1218_tct_vacant + 
+                                chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                                chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                                chg1218_tct_housdens + 
+                                chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                                chg1218_tct_transit + 
+                                chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                                chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                                chg1218_tct_popgrowth,
+                              data = rundata@data,
+                              family = "binomial")
+confint(chain3.binV.nonspatial)
+data.frame( coef(chain3.binV.nonspatial) )
 
 
 #
@@ -467,31 +466,51 @@ dev.off()
 
 chain1.binG$fitted.values # model estimated probability of each tract to gentrify
 
-# predict( chain1.binG ) # no 'predict' method for CARBayes; need to do it manually...
+# predict( chain1.binG ) # no 'predict' method for CARBayes or ngspatial; need to do it manually.
 
 # Run non-spatial
-predmodel <- glm(formula = c3_vulg ~ 
-                   tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                   chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                   chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                   tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                   chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
+predmodelG <- glm(formula = c3_vulg ~ 
+                   chg1218_tct_multunit + chg1218_tct_vacant +
+                   chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                   chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                   chg1218_tct_housdens + 
+                   chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                   chg1218_tct_transit + 
+                   chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                   chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                   chg1218_tct_popgrowth,
                  data = rundata@data,
                  family = "binomial")
-confint(predmodel)
-data.frame( coef(predmodel) )
+confint(predmodelG)
+data.frame( coef(predmodelG) )
 
-# Create new DF holding constant and manipulating key var
-
-
-predmodelV <- glm(formula = c4_vul ~ 
-                    tct_multunit12 + tct_vacant12 +  tct_newbuild18 + 
-                    chg1218_tct_singfam + chg1218_tct_renters + chg1218_tct_medhome_pct + chg1218_tct_medrent_pct + 
-                    chg1218_tct_housdens + chg1218_tct_popgrowth + 
-                    tct_rentburd12 + tct_diffhou12 + tct_transit12 +  tct_unemp12 + tct_inpov12 + 
-                    chg1218_tct_withba + chg1218_tct_nonhispwh + chg1218_tct_nonfam + chg1218_tct_hhinc_pct,
+predmodelVng <- glm(formula = c2_vulnotg ~ 
+                    chg1218_tct_multunit + chg1218_tct_vacant + 
+                    chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                    chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                    chg1218_tct_housdens + 
+                    chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                    chg1218_tct_transit + 
+                    chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                    chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                    chg1218_tct_popgrowth,
                   data = rundata@data,
                   family = "binomial")
+confint(predmodelVng)
+data.frame( coef(predmodelVng) )
+
+predmodelV <- glm(formula = c4_vul ~ 
+                      chg1218_tct_multunit + chg1218_tct_vacant + 
+                      chg1218_tct_singfam + chg1218_tct_medhome_pct + 
+                      chg1218_tct_renters + chg1218_tct_medrent_pct + 
+                      chg1218_tct_housdens + 
+                      chg1218_tct_rentburd + chg1218_tct_diffhou + 
+                      chg1218_tct_transit + 
+                      chg1218_tct_unemp + chg1218_tct_inpov + chg1218_tct_hhinc_pct + 
+                      chg1218_tct_nonfam + chg1218_tct_withba + chg1218_tct_nonhispwh + 
+                      chg1218_tct_popgrowth,
+                    data = rundata@data,
+                    family = "binomial")
 confint(predmodelV)
 data.frame( coef(predmodelV) )
 
@@ -501,16 +520,25 @@ data.frame( coef(predmodelV) )
 #
 
 # reduce the change in home prices by X percent (0 to 50 in intervals of 5)
-reduce <- seq(0,25,by=2.5)
+reduce <- seq(0, 25, by = 2.5)
 
-pred_probs <- matrix(NA,nrow=nrow(rundata@data),ncol=length(reduce))
+# Outcome = vulnerable and gentrified
+pred_probsG <- matrix(NA, nrow = nrow(rundata@data), ncol = length(reduce))
 for(i in 1:length(reduce)){
   newdata_houseprice <- rundata@data
   newdata_houseprice$chg1218_tct_medhome_pct <- newdata_houseprice$chg1218_tct_medhome_pct - reduce[i]
-  pred_probs[,i] <- predict(predmodel, newdata = newdata_houseprice, type = "response")
+  pred_probsG[,i] <- predict(predmodelG, newdata = newdata_houseprice, type = "response")
 }
 
-# do the same but for vulnerable tracts
+# Outcome = vulnerable not gentrified
+pred_probsVng <- matrix(NA,nrow=nrow(rundata@data),ncol=length(reduce))
+for(i in 1:length(reduce)){
+  newdata_houseprice <- rundata@data
+  newdata_houseprice$chg1218_tct_medhome_pct <- newdata_houseprice$chg1218_tct_medhome_pct - reduce[i]
+  pred_probsVng[,i] <- predict(predmodelVng, newdata = newdata_houseprice, type = "response")
+}
+
+# Outcome = vulnerable
 pred_probsV <- matrix(NA,nrow=nrow(rundata@data),ncol=length(reduce))
 for(i in 1:length(reduce)){
   newdata_houseprice <- rundata@data
@@ -520,34 +548,37 @@ for(i in 1:length(reduce)){
 
 # look at the intervention effects on fitted probabilities: 10% reduction in housing costs (reduce[5]=10)
 # see which tracts that would gentrify will no longer gentrify
-sum( pred_probs[,1] > .5 ) # 35 tracts
-sum( pred_probs[,5] > .5 ) # 19 tracts
-which(pred_probs[,1] > .5 & pred_probs[,5] <= .5 ) # 16 no longer gentrify
+sum( pred_probsG[,1] > .5 ) # 34 tracts
+sum( pred_probsG[,5] > .5 ) # 17 tracts
+which(pred_probsG[,1] > .5 & pred_probsG[,5] <= .5 ) # 17 no longer gentrify
+hist( pred_probsG[,5] - pred_probsG[,1] )
 
-hist( pred_probs[,5] - pred_probs[,1] )
+# Same but for vulnerable not gentrified
+sum( pred_probsVng[,1] > .5 ) # 21 tracts
+sum( pred_probsVng[,5] > .5 ) # 44 tracts
+which(pred_probsVng[,1] > .5 & pred_probsVng[,5] <= .5) # 0 no longer vulnerable but not gentrified
 
-
-
-sum( pred_probsV[,1] > .5 ) # 87 tracts
-sum( pred_probsV[,5] > .5 ) # 72 tracts
-which(pred_probsV[,1] > .5 & pred_probsV[,5] <= .5) # 15 no longer vulnerable
-
+# Same but for all vulnerable
+sum( pred_probsV[,1] > .5 ) # 80 tracts
+sum( pred_probsV[,5] > .5 ) # 59 tracts
+which(pred_probsV[,1] > .5 & pred_probsV[,5] <= .5) # 21 no longer vulnerable but not gentrified
 
 # create outcome variables
 data <- st_as_sf(rundata)
-threshhold = 0.4
+threshhold <- 0.5
 
 data$type1218_predicted <- "Not vulnerable"
 data$type1218_predicted[ pred_probsV[,1] > threshhold ] <- "Vulnerable, did not gentrify"
-data$type1218_predicted[ pred_probs[,1] > threshhold ] <- "Vulnerable, gentrified"
+data$type1218_predicted[ pred_probsG[,1] > threshhold ] <- "Vulnerable, gentrified"
 
 data$type1218_intervention <- "Not vulnerable"
 data$type1218_intervention[ pred_probsV[,5] > threshhold ] <- "Vulnerable, did not gentrify"
-data$type1218_intervention[ pred_probs[,5] > threshhold ] <- "Vulnerable, gentrified"
+data$type1218_intervention[ pred_probsG[,5] > threshhold ] <- "Vulnerable, gentrified"
 
 table(data$type1218)
 table(data$type1218_predicted)
 table(data$type1218_intervention)
+
 
 #
 # Choropleth plots: 10% housing price reduction ------------------------------------------------------
@@ -564,32 +595,44 @@ ffxgeo <- ffxgeo %>% select(GEOID, geometry)
 p1 <- ggplot(data = data) +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
   geom_sf(aes(fill = type1218), size = 0.2) +
-  labs(title = "True Outcomes\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  labs(title = "Classification Outcomes\nFairfax County Tract-Level Gentrification",
+      subtitle = "2008/12 to 2014/18") +
   theme_map() +
   theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+ggsave("outcomes_class.png", plot = p1, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300)
 
 p2 <- ggplot(data = data) +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
   geom_sf(aes(fill = type1218_predicted), size = 0.2) +
-  labs(title = "Model Predicted Outcomes\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  labs(title = "Model Predicted Outcomes\nFairfax County Tract-Level Gentrification",
+       subtitle = "2008/12 to 2014/18") +
   theme_map() +
   theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+ggsave("outcomes_model.png", plot = p2, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300)
 
 p3 <- ggplot(data = data) +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
   geom_sf(aes(fill = type1218_intervention), size = 0.2) +
-  labs(title = "Intervention, 10% Housing Cost Reduction\nFairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  labs(title = "Intervention, 10% Median Property Value Reduction\nFairfax County Tract-Level Gentrification",
+       subtitle = "2008/12 to 2014/18") +
   theme_map() +
   theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
   scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+ggsave("outcomes_interv.png", plot = p3, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300)
 
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
@@ -621,41 +664,77 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-pdf("~/git/fairfax/src/gentri/interventionExample.pdf",width=12,height=5)
-multiplot(p1,p2,p3,cols=3)
+p1 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218), size = 0.2) +
+  labs(title = "Fairfax County Tract-Level Gentrification",
+       subtitle = "Classification Outcomes") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        plot.subtitle = element_text(size = 11),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11)) +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+p2 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218_predicted), size = 0.2) +
+  labs(title = "\n",
+       subtitle = "Model Predicted Outcomes") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        plot.subtitle = element_text(size = 11),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = "none") +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+p3 <- ggplot(data = data) +
+  geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
+  geom_sf(aes(fill = type1218_intervention), size = 0.2) +
+  labs(title = "\n",
+       subtitle = "Intervention Model Predicted Outcomes\n(10% Median Property Value Reduction") +
+  theme_map() +
+  theme(plot.title = element_text(size = 13, face = "bold"),
+        plot.subtitle = element_text(size = 11),
+        legend.title = element_text(size = 11, face = "bold"),
+        legend.text = element_text(size = 11),
+        legend.position = "none") +
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+
+pdf("./output/gentri/outcomes_comparison.pdf", width = 15, height = 7)
+multiplot(p1, p2, p3, cols = 3)
 dev.off()
+
 
 #
 # Model predictions: Housing price ------------------------------------------------------
 #
 
 newdata_houseprice <- with(rundata@data, 
-                           data.frame(tct_multunit12 = mean(tct_multunit12),
-                                      tct_vacant12 = mean(tct_vacant12),
-                                      tct_newbuild18 = mean(tct_newbuild18),
+                           data.frame(chg1218_tct_multunit = mean(chg1218_tct_multunit),
+                                      chg1218_tct_vacant = mean(chg1218_tct_vacant),
                                       chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                      chg1218_tct_renters = mean(chg1218_tct_renters),
                                       chg1218_tct_medhome_pct = seq(0, 80, by = 5),
+                                      chg1218_tct_renters = mean(chg1218_tct_renters),
                                       chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
                                       chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                      chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                      tct_rentburd12 = mean(tct_rentburd12), 
-                                      tct_diffhou12 = mean(tct_diffhou12), 
-                                      tct_transit12 = mean(tct_transit12),
-                                      tct_unemp12 = mean(tct_unemp12),
-                                      tct_inpov12 = mean(tct_inpov12),
+                                      chg1218_tct_rentburd = mean(chg1218_tct_rentburd),
+                                      chg1218_tct_diffhou = mean(chg1218_tct_diffhou),
+                                      chg1218_tct_transit = mean(chg1218_tct_transit),
+                                      chg1218_tct_unemp = mean(chg1218_tct_unemp),
+                                      chg1218_tct_inpov = mean(chg1218_tct_inpov),
+                                      chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct),
+                                      chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
                                       chg1218_tct_withba = mean(chg1218_tct_withba),
                                       chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
-                                      chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                      chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                                      chg1218_tct_popgrowth  = mean(chg1218_tct_popgrowth)
                            ))
 
-newdata_houseprice$housepriceP <- predict(predmodel, newdata = newdata_houseprice, type = "response")
-
-
+newdata_houseprice$housepriceP <- predict(predmodelG, newdata = newdata_houseprice, type = "response")
 
 # Get SE
-newdata_houseprice <- cbind(newdata_houseprice, predict(predmodel, newdata = newdata_houseprice, type = "link",
+newdata_houseprice <- cbind(newdata_houseprice, predict(predmodelG, newdata = newdata_houseprice, type = "link",
                                                         se = TRUE))
 newdata_houseprice <- within(newdata_houseprice, {
   PredictedProb <- plogis(fit)
@@ -664,14 +743,26 @@ newdata_houseprice <- within(newdata_houseprice, {
 })
 
 # Plot
-ggplot(newdata_houseprice, aes(x = chg1218_tct_medhome_pct, y = PredictedProb)) + 
+pp_propvalue <- ggplot(newdata_houseprice, aes(x = chg1218_tct_medhome_pct, y = PredictedProb)) + 
   labs(title = "Predicted probability of tract gentrification by percent increase in median property value", 
-       x = "% increase in median property value",
+       x = "Percent increase in median property value",
        y = "Predicted probability") +
   geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
   geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(0, 80, 10), limits = c(0, 80)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))
+  scale_x_continuous(breaks = seq(0, 80, 10), limits = c(0, 80), expand = c(0, 0)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1), expand = c(0, 0)) + 
+  theme_light(base_size = 12) + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 13),
+        plot.caption = element_text(size = 12),
+        plot.subtitle = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12, face = "bold"))
+ggsave("predprob_propertyvalue.png", plot = pp_propvalue, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300)
 
 
 #
@@ -679,30 +770,29 @@ ggplot(newdata_houseprice, aes(x = chg1218_tct_medhome_pct, y = PredictedProb)) 
 #
 
 newdata_unempl <- with(rundata@data, 
-                       data.frame(tct_multunit12 = mean(tct_multunit12),
-                                  tct_vacant12 = mean(tct_vacant12),
-                                  tct_newbuild18 = mean(tct_newbuild18),
+                       data.frame(chg1218_tct_multunit = mean(chg1218_tct_multunit),
+                                  chg1218_tct_vacant = mean(chg1218_tct_vacant),
                                   chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                  chg1218_tct_renters = mean(chg1218_tct_renters),
                                   chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                  chg1218_tct_renters = mean(chg1218_tct_renters),
                                   chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
                                   chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                  tct_rentburd12 = mean(tct_rentburd12), 
-                                  tct_diffhou12 = mean(tct_diffhou12), 
-                                  tct_transit12 = mean(tct_transit12),
-                                  tct_unemp12 = seq(0, 15, by = 5),
-                                  tct_inpov12 = mean(tct_inpov12),
+                                  chg1218_tct_rentburd = mean(chg1218_tct_rentburd),
+                                  chg1218_tct_diffhou = mean(chg1218_tct_diffhou),
+                                  chg1218_tct_transit = mean(chg1218_tct_transit),
+                                  chg1218_tct_unemp = seq(-10, 15, by = 5),
+                                  chg1218_tct_inpov = mean(chg1218_tct_inpov),
+                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct),
+                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
                                   chg1218_tct_withba = mean(chg1218_tct_withba),
                                   chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
-                                  chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                                  chg1218_tct_popgrowth  = mean(chg1218_tct_popgrowth)
                        ))
 
-newdata_unempl$unemplP <- predict(predmodel, newdata = newdata_unempl, type = "response")
+newdata_unempl$unemplP <- predict(predmodelG, newdata = newdata_unempl, type = "response")
 
 # Get SE
-newdata_unempl <- cbind(newdata_unempl, predict(predmodel, newdata = newdata_unempl, type = "link",
+newdata_unempl <- cbind(newdata_unempl, predict(predmodelG, newdata = newdata_unempl, type = "link",
                                                 se = TRUE))
 newdata_unempl <- within(newdata_unempl, {
   PredictedProb <- plogis(fit)
@@ -711,14 +801,26 @@ newdata_unempl <- within(newdata_unempl, {
 })
 
 # Plot
-ggplot(newdata_unempl, aes(x = tct_unemp12, y = PredictedProb)) + 
-  labs(title = "Predicted probability of tract gentrification by percent unemployed", 
-       x = "% unemployed",
+pp_unemp <- ggplot(newdata_unempl, aes(x = chg1218_tct_unemp, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by change in percent unemployed", 
+       x = "Change in percent unemployed",
        y = "Predicted probability") +
   geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
   geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(0, 15, 5), limits = c(0, 15)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))      
+  scale_x_continuous(breaks = seq(-10, 15, 5), limits = c(-10, 15), expand = c(0, 0)) +
+  scale_y_continuous(breaks = seq(0, 0.6, 0.1), limits = c(0, 0.6), expand = c(0, 0)) + 
+  theme_light(base_size = 12) + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 13),
+        plot.caption = element_text(size = 12),
+        plot.subtitle = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12, face = "bold"))
+ggsave("predprob_unempl.png", plot = pp_unemp, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300) 
 
 
 #
@@ -726,30 +828,29 @@ ggplot(newdata_unempl, aes(x = tct_unemp12, y = PredictedProb)) +
 #
 
 newdata_withba <- with(rundata@data, 
-                       data.frame(tct_multunit12 = mean(tct_multunit12),
-                                  tct_vacant12 = mean(tct_vacant12),
-                                  tct_newbuild18 = mean(tct_newbuild18),
+                       data.frame(chg1218_tct_multunit = mean(chg1218_tct_multunit),
+                                  chg1218_tct_vacant = mean(chg1218_tct_vacant),
                                   chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                  chg1218_tct_renters = mean(chg1218_tct_renters),
                                   chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                  chg1218_tct_renters = mean(chg1218_tct_renters),
                                   chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
                                   chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                  chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                  tct_rentburd12 = mean(tct_rentburd12), 
-                                  tct_diffhou12 = mean(tct_diffhou12), 
-                                  tct_transit12 = mean(tct_transit12),
-                                  tct_unemp12 = mean(tct_unemp12),
-                                  tct_inpov12 = mean(tct_inpov12),
-                                  chg1218_tct_withba = seq(0, 25, by = 5),
-                                  chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                  chg1218_tct_rentburd = mean(chg1218_tct_rentburd),
+                                  chg1218_tct_diffhou = mean(chg1218_tct_diffhou),
+                                  chg1218_tct_transit = mean(chg1218_tct_transit),
+                                  chg1218_tct_unemp = mean(chg1218_tct_unemp),
+                                  chg1218_tct_inpov = mean(chg1218_tct_inpov),
+                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct),
                                   chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                  chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                                  chg1218_tct_withba = seq(-10, 25, by = 5),
+                                  chg1218_tct_nonhispwh = mean(chg1218_tct_nonhispwh),
+                                  chg1218_tct_popgrowth  = mean(chg1218_tct_popgrowth)
                        ))
 
-newdata_withba$withbaP <- predict(predmodel, newdata = newdata_withba, type = "response")
+newdata_withba$withbaP <- predict(predmodelG, newdata = newdata_withba, type = "response")
 
 # Get SE
-newdata_withba <- cbind(newdata_withba, predict(predmodel, newdata = newdata_withba, type = "link",
+newdata_withba <- cbind(newdata_withba, predict(predmodelG, newdata = newdata_withba, type = "link",
                                                 se = TRUE))
 newdata_withba <- within(newdata_withba, {
   PredictedProb <- plogis(fit)
@@ -758,14 +859,26 @@ newdata_withba <- within(newdata_withba, {
 })
 
 # Plot
-ggplot(newdata_withba, aes(x = chg1218_tct_withba, y = PredictedProb)) + 
-  labs(title = "Predicted probability of tract gentrification by percent change in population with BA", 
-       x = "% change in population with BA",
+pp_withba <- ggplot(newdata_withba, aes(x = chg1218_tct_withba, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by change in percent population with BA", 
+       x = "Change in percent population with BA",
        y = "Predicted probability") +
   geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
   geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(0, 25, 5), limits = c(0, 25)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))   
+  scale_x_continuous(breaks = seq(-10, 25, 5), limits = c(-10, 25), expand = c(0, 0)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1), expand = c(0, 0)) + 
+  theme_light(base_size = 12) + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 13),
+        plot.caption = element_text(size = 12),
+        plot.subtitle = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12, face = "bold"))
+ggsave("predprob_withba.png", plot = pp_withba, device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300) 
 
 
 #
@@ -773,30 +886,29 @@ ggplot(newdata_withba, aes(x = chg1218_tct_withba, y = PredictedProb)) +
 #
 
 newdata_nonhispw <- with(rundata@data, 
-                         data.frame(tct_multunit12 = mean(tct_multunit12),
-                                    tct_vacant12 = mean(tct_vacant12),
-                                    tct_newbuild18 = mean(tct_newbuild18),
+                         data.frame(chg1218_tct_multunit = mean(chg1218_tct_multunit),
+                                    chg1218_tct_vacant = mean(chg1218_tct_vacant),
                                     chg1218_tct_singfam = mean(chg1218_tct_singfam),
-                                    chg1218_tct_renters = mean(chg1218_tct_renters),
                                     chg1218_tct_medhome_pct = mean(chg1218_tct_medhome_pct),
+                                    chg1218_tct_renters = mean(chg1218_tct_renters),
                                     chg1218_tct_medrent_pct = mean(chg1218_tct_medrent_pct),
                                     chg1218_tct_housdens = mean(chg1218_tct_housdens),
-                                    chg1218_tct_popgrowth = mean(chg1218_tct_popgrowth),
-                                    tct_rentburd12 = mean(tct_rentburd12), 
-                                    tct_diffhou12 = mean(tct_diffhou12), 
-                                    tct_transit12 = mean(tct_transit12),
-                                    tct_unemp12 = mean(tct_unemp12),
-                                    tct_inpov12 = mean(tct_inpov12),
-                                    chg1218_tct_withba = mean(chg1218_tct_withba),
-                                    chg1218_tct_nonhispwh = seq(0, 20, by = 5),
+                                    chg1218_tct_rentburd = mean(chg1218_tct_rentburd),
+                                    chg1218_tct_diffhou = mean(chg1218_tct_diffhou),
+                                    chg1218_tct_transit = mean(chg1218_tct_transit),
+                                    chg1218_tct_unemp = mean(chg1218_tct_unemp),
+                                    chg1218_tct_inpov = mean(chg1218_tct_inpov),
+                                    chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct),
                                     chg1218_tct_nonfam = mean(chg1218_tct_nonfam),
-                                    chg1218_tct_hhinc_pct = mean(chg1218_tct_hhinc_pct)
+                                    chg1218_tct_withba = mean(chg1218_tct_withba),
+                                    chg1218_tct_nonhispwh = seq(-20, 15, by = 5),
+                                    chg1218_tct_popgrowth  = mean(chg1218_tct_popgrowth)
                          ))
 
-newdata_nonhispw$nonhispP <- predict(predmodel, newdata = newdata_nonhispw, type = "response")
+newdata_nonhispw$nonhispP <- predict(predmodelG, newdata = newdata_nonhispw, type = "response")
 
 # Get SE
-newdata_nonhispw <- cbind(newdata_nonhispw, predict(predmodel, newdata = newdata_nonhispw, type = "link",
+newdata_nonhispw <- cbind(newdata_nonhispw, predict(predmodelG, newdata = newdata_nonhispw, type = "link",
                                                     se = TRUE))
 newdata_nonhispw <- within(newdata_nonhispw, {
   PredictedProb <- plogis(fit)
@@ -805,12 +917,24 @@ newdata_nonhispw <- within(newdata_nonhispw, {
 })
 
 # Plot
-ggplot(newdata_nonhispw, aes(x = chg1218_tct_nonhispwh, y = PredictedProb)) + 
-  labs(title = "Predicted probability of tract gentrification by percent change in non-Hispanic white population", 
-       x = "% change in non-Hispanic white population",
+pp_nonhispw <- ggplot(newdata_nonhispw, aes(x = chg1218_tct_nonhispwh, y = PredictedProb)) + 
+  labs(title = "Predicted probability of tract gentrification by change in percent\nnon-Hispanic white population", 
+       x = "Change in percent non-Hispanic white population",
        y = "Predicted probability") +
   geom_ribbon(aes(ymin = LL, ymax = UL), alpha = 0.2) + 
   geom_line(size = 1) +
-  scale_x_continuous(breaks = seq(0, 20, 5), limits = c(0, 20)) +
-  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1))   
+  scale_x_continuous(breaks = seq(-20, 15, 5), limits = c(-20, 15), expand = c(0, 0)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.20), limits = c(0, 1), expand = c(0, 0)) + 
+  theme_light(base_size = 12) + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        axis.text = element_text(size = 13),
+        plot.caption = element_text(size = 12),
+        plot.subtitle = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12, face = "bold"))
+ggsave("predprob_nonhispwh.png", plot = pp_nonhispw , device = "png", path = "./output/gentri/",
+       scale = 2, width = 120, height = 80, units = "mm", dpi = 300) 
 
