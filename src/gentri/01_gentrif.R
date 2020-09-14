@@ -446,10 +446,13 @@ show_col(viridis_pal(option = "")(10))
 ggplot(data = data) +
   geom_sf(data = ffxgeo, size = 0.2, fill = "#F0F0F0") +
   geom_sf(aes(fill = type1218), size = 0.2) +
-  labs(title = "Fairfax County Tract-Level Gentrification\n2008/12 to 2014/18") +
+  labs(title = "Fairfax County Tract-Level Gentrification\n2008/12 to 2014/18",
+       caption = "Data Source: American Community Survey.\nNote: Data not available for tracts show in light gray.") +
   theme_map() +
-  theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5),
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_text(size = 11, face = "bold"),
         legend.text = element_text(size = 11)) +
-  scale_fill_manual(name = "Status", guide = "legend", values = c("#FCFDBF", "#FEC98D", "#F1605D"), na.value = "FFFFFF")
+  scale_fill_manual(name = "Status", guide = "legend", values = c("#CCCCCC", "#141E3C", "#EB5F0C"), 
+                    na.translate = TRUE, na.value = "FFFFFF")
 
+  

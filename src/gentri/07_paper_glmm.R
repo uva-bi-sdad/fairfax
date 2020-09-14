@@ -561,7 +561,7 @@ which(pred_probsVng[,1] > .5 & pred_probsVng[,5] <= .5) # 0 no longer vulnerable
 # Same but for all vulnerable
 sum( pred_probsV[,1] > .5 ) # 80 tracts
 sum( pred_probsV[,5] > .5 ) # 59 tracts
-which(pred_probsV[,1] > .5 & pred_probsV[,5] <= .5) # 21 no longer vulnerable but not gentrified
+which(pred_probsV[,1] > .5 & pred_probsV[,5] <= .5) # 21 no longer vulnerable
 
 # create outcome variables
 data <- st_as_sf(rundata)
