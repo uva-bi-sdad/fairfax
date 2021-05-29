@@ -11,7 +11,7 @@ library(ggthemes)
 library(janitor)
 
 # Read in data
-housing_data <- read_csv("/sfs/qumulo/qhome/kb7hp/fairfax/rivanna_data/working/fairfax_publichousing_2020.csv")
+housing_data <- read_csv("/sfs/qumulo/qhome/kb7hp/data/fairfax_publichousing_2020.csv")
 
 #
 # Geocode ----------------------------------------------------------------------------------------------------
